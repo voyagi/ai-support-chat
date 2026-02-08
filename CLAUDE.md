@@ -155,8 +155,8 @@ Copy `.env.example` to `.env.local` and fill in:
 
 - `OPENAI_API_KEY` — OpenAI API key
 - `NEXT_PUBLIC_SUPABASE_URL` — Supabase project URL
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY` — Supabase anon key
-- `SUPABASE_SERVICE_ROLE_KEY` — Supabase service role key (server-side only)
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` — Supabase publishable key
+- `SUPABASE_SECRET_KEY` — Supabase secret key (server-side only)
 
 ## Demo Data
 
