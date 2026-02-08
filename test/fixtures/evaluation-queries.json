@@ -1,0 +1,167 @@
+{
+  "description": "Ground truth test cases for RAG evaluation. Each query maps to expected source documents and topics. The 'relevantChunkIds' field will be populated after seeding when chunk IDs are known.",
+  "testCases": [
+    {
+      "id": "eval-01",
+      "query": "How much does FlowBoard cost?",
+      "category": "pricing",
+      "expectedDocuments": ["flowboard-pricing.md"],
+      "expectedTopics": ["pricing", "cost", "tiers", "monthly"],
+      "expectedAnswer": "FlowBoard offers three tiers: Free (up to 5 users, 3 projects), Pro ($12/user/month), and Enterprise ($29/user/month). Annual billing saves 20%.",
+      "difficulty": "easy"
+    },
+    {
+      "id": "eval-02",
+      "query": "Does FlowBoard have Kanban boards?",
+      "category": "features",
+      "expectedDocuments": ["flowboard-features.md"],
+      "expectedTopics": ["kanban", "boards", "drag-and-drop", "columns"],
+      "expectedAnswer": "Yes, FlowBoard has Kanban boards with drag-and-drop task cards, customizable columns, swimlanes, and WIP limits.",
+      "difficulty": "easy"
+    },
+    {
+      "id": "eval-03",
+      "query": "How do I create my first project?",
+      "category": "getting-started",
+      "expectedDocuments": ["flowboard-getting-started.md"],
+      "expectedTopics": ["project", "create", "setup", "template"],
+      "expectedAnswer": "Click 'Create Project', provide a name and project key (2-4 letters), choose a template or start blank, and set privacy (public or private).",
+      "difficulty": "easy"
+    },
+    {
+      "id": "eval-04",
+      "query": "Is FlowBoard SOC 2 compliant?",
+      "category": "security",
+      "expectedDocuments": ["flowboard-security-compliance.md"],
+      "expectedTopics": ["SOC 2", "compliance", "audit", "certification"],
+      "expectedAnswer": "Yes, FlowBoard is SOC 2 Type II certified, audited annually by an independent third-party auditor. Enterprise customers can request the SOC 2 report by emailing compliance@flowboard.io.",
+      "difficulty": "easy"
+    },
+    {
+      "id": "eval-05",
+      "query": "Is there a FlowBoard mobile app?",
+      "category": "mobile",
+      "expectedDocuments": ["flowboard-mobile-app.md"],
+      "expectedTopics": ["mobile", "app", "iOS", "Android"],
+      "expectedAnswer": "Yes, FlowBoard has native iOS and Android apps with offline mode, push notifications, and feature parity with the web version. Download from App Store or Google Play.",
+      "difficulty": "easy"
+    },
+    {
+      "id": "eval-06",
+      "query": "What is the FlowBoard API rate limit?",
+      "category": "api",
+      "expectedDocuments": ["flowboard-api-reference.md"],
+      "expectedTopics": ["API", "rate limit", "requests", "hour"],
+      "expectedAnswer": "Free tier: 100 requests/hour, Pro: 1,000 requests/hour, Enterprise: 5,000 requests/hour. Rate limits reset on the hour.",
+      "difficulty": "easy"
+    },
+    {
+      "id": "eval-07",
+      "query": "Can I import my Jira projects into FlowBoard?",
+      "category": "integrations",
+      "expectedDocuments": ["flowboard-integrations.md"],
+      "expectedTopics": ["Jira", "import", "migration", "data"],
+      "expectedAnswer": "Yes, use the Jira Import wizard (Settings > Integrations > Jira Import). It transfers projects, issues, comments, attachments, and custom fields. The import is idempotent and supports incremental updates.",
+      "difficulty": "medium"
+    },
+    {
+      "id": "eval-08",
+      "query": "What happens when I downgrade from Pro to Free?",
+      "category": "billing",
+      "expectedDocuments": ["flowboard-billing-faq.md"],
+      "expectedTopics": ["downgrade", "Pro", "Free", "billing"],
+      "expectedAnswer": "Downgrades take effect at the end of your current billing period. If you exceed Free limits (>5 users, >3 projects), you must remove excess users or archive projects before the downgrade completes. You'll receive email instructions 7 days before.",
+      "difficulty": "medium"
+    },
+    {
+      "id": "eval-09",
+      "query": "How do I give a client view-only access?",
+      "category": "team",
+      "expectedDocuments": ["flowboard-team-management.md"],
+      "expectedTopics": ["guest", "client", "view-only", "access"],
+      "expectedAnswer": "Invite them as a Guest (Settings > Team > Invite Members > select Guest role). Guests have read-only access to specific projects you assign, can comment, but cannot create or edit tasks. Guests don't count as billable users.",
+      "difficulty": "medium"
+    },
+    {
+      "id": "eval-10",
+      "query": "What integrations work with FlowBoard?",
+      "category": "integrations",
+      "expectedDocuments": ["flowboard-integrations.md"],
+      "expectedTopics": ["integrations", "Slack", "GitHub", "Google Drive"],
+      "expectedAnswer": "FlowBoard integrates with Slack, GitHub, GitLab, Google Drive, Figma, Jira (import), and Zapier (5,000+ apps). Free tier includes Slack and Google Drive. Pro and Enterprise get all integrations.",
+      "difficulty": "medium"
+    },
+    {
+      "id": "eval-11",
+      "query": "How do I set up two-factor authentication?",
+      "category": "security",
+      "expectedDocuments": ["flowboard-security-compliance.md"],
+      "expectedTopics": ["2FA", "two-factor", "authentication", "security"],
+      "expectedAnswer": "Go to Settings > Security > Two-Factor Authentication, click 'Enable 2FA', scan the QR code with an authenticator app (Authy, Google Authenticator, 1Password), enter the 6-digit code, and save your recovery codes.",
+      "difficulty": "medium"
+    },
+    {
+      "id": "eval-12",
+      "query": "Can I use FlowBoard offline on my phone?",
+      "category": "mobile",
+      "expectedDocuments": ["flowboard-mobile-app.md"],
+      "expectedTopics": ["offline", "mobile", "sync", "mode"],
+      "expectedAnswer": "Yes, the mobile app supports offline mode. You can view cached tasks, create/edit tasks, and add comments offline. Changes sync automatically when you reconnect. Conflict resolution handles simultaneous edits.",
+      "difficulty": "medium"
+    },
+    {
+      "id": "eval-13",
+      "query": "whats the cheepest plan",
+      "category": "pricing",
+      "expectedDocuments": ["flowboard-pricing.md"],
+      "expectedTopics": ["free", "pricing", "cost", "tier"],
+      "expectedAnswer": "The Free plan costs $0/month and includes up to 5 users, 3 projects, 5 GB storage, and basic features. It's perfect for small teams or freelancers.",
+      "difficulty": "hard"
+    },
+    {
+      "id": "eval-14",
+      "query": "I need something for my team of 20 with SSO, what do you recommend?",
+      "category": "pricing",
+      "expectedDocuments": ["flowboard-pricing.md", "flowboard-security-compliance.md"],
+      "expectedTopics": ["Enterprise", "SSO", "team", "pricing"],
+      "expectedAnswer": "You need the Enterprise tier ($29/user/month or $24/user/month annually). It includes SSO (SAML), advanced security, audit logs, dedicated support, and 99.95% uptime SLA. Minimum 50 users required. Contact sales@flowboard.io for custom pricing.",
+      "difficulty": "hard"
+    },
+    {
+      "id": "eval-15",
+      "query": "how much storage do I get and can I connect to github",
+      "category": "features",
+      "expectedDocuments": ["flowboard-pricing.md", "flowboard-integrations.md"],
+      "expectedTopics": ["storage", "GitHub", "integration", "GB"],
+      "expectedAnswer": "Free tier: 5 GB storage. Pro tier: 100 GB per user. Enterprise: unlimited storage. GitHub integration is available for Pro and Enterprise users - it syncs pull requests, commits, and branch status automatically.",
+      "difficulty": "hard"
+    },
+    {
+      "id": "eval-16",
+      "query": "We're worried about GDPR - is our data safe in FlowBoard?",
+      "category": "security",
+      "expectedDocuments": ["flowboard-security-compliance.md"],
+      "expectedTopics": ["GDPR", "compliance", "data", "EU"],
+      "expectedAnswer": "Yes, FlowBoard is fully GDPR compliant. We provide Data Processing Agreements (DPA), EU data residency options (AWS Frankfurt), support for data subject rights (access, deletion, portability), and AES-256 encryption at rest.",
+      "difficulty": "hard"
+    },
+    {
+      "id": "eval-17",
+      "query": "flowboard vs asana pricing",
+      "category": "pricing",
+      "expectedDocuments": ["flowboard-pricing.md"],
+      "expectedTopics": ["pricing", "comparison", "cost"],
+      "expectedAnswer": "FlowBoard pricing: Free (5 users, 3 projects), Pro ($12/user/month), Enterprise ($29/user/month). We don't have direct Asana comparison data in the knowledge base, but FlowBoard's pricing is competitive for similar feature sets.",
+      "difficulty": "hard"
+    },
+    {
+      "id": "eval-18",
+      "query": "tell me everything about the enterprise plan",
+      "category": "pricing",
+      "expectedDocuments": ["flowboard-pricing.md", "flowboard-security-compliance.md", "flowboard-team-management.md"],
+      "expectedTopics": ["Enterprise", "SSO", "audit", "support", "pricing"],
+      "expectedAnswer": "Enterprise plan ($29/user/month or $24 annually) includes: SSO/SAML, 2FA enforcement, audit logs, data residency options, 99.95% uptime SLA, dedicated Customer Success Manager, unlimited storage, custom contracts, priority support (2-hour SLA), advanced permissions, SCIM provisioning. Minimum 50 users. Contact sales@flowboard.io.",
+      "difficulty": "hard"
+    }
+  ]
+}
