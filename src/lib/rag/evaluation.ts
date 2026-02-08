@@ -82,30 +82,6 @@ export function calculatePrecisionAtK(
 }
 
 /**
- * Calculate Recall@K: What fraction of relevant docs were found in top K?
- *
- * @param retrievedIds - Array of retrieved chunk IDs (ordered by relevance)
- * @param relevantIds - Array of ground truth relevant chunk IDs
- * @param k - Number of top results to consider
- * @returns Recall score from 0.0 to 1.0
- */
-export function calculateRecallAtK(
-	retrievedIds: string[],
-	relevantIds: string[],
-	k: number,
-): number {
-	if (relevantIds.length === 0) {
-		return 1.0; // No relevant docs to find = perfect recall
-	}
-
-	const topK = retrievedIds.slice(0, k);
-	const relevantSet = new Set(relevantIds);
-	const relevantFound = topK.filter((id) => relevantSet.has(id)).length;
-
-	return relevantFound / relevantIds.length;
-}
-
-/**
  * Evaluate retrieval quality across a set of test cases
  *
  * @param testCases - Array of test queries with expected documents
@@ -132,16 +108,23 @@ export async function evaluateRetrieval(
 		const retrievedTitles = searchResults.map((r) => r.documentTitle);
 		const expectedTitles = testCase.expectedDocuments;
 
-		// Calculate relevance: a result is relevant if its document title matches any expected title
+		// For precision@5: check how many of top 5 chunks come from expected documents
 		const relevantResults = searchResults.filter((r) =>
 			expectedTitles.includes(r.documentTitle),
 		);
 		const relevantIds = relevantResults.map((r) => r.id);
 		const retrievedIds = searchResults.map((r) => r.id);
-
-		// Calculate metrics
 		const precisionAt5 = calculatePrecisionAtK(retrievedIds, relevantIds, 5);
-		const recallAt20 = calculateRecallAtK(retrievedIds, relevantIds, 20);
+
+		// For recall@20: check how many expected documents have at least one chunk in top 20
+		const retrievedDocTitlesSet = new Set(retrievedTitles);
+		const expectedDocsFound = expectedTitles.filter((title) =>
+			retrievedDocTitlesSet.has(title),
+		).length;
+		const recallAt20 =
+			expectedTitles.length > 0
+				? expectedDocsFound / expectedTitles.length
+				: 1.0;
 
 		// Track similarity scores
 		for (const result of searchResults) {

@@ -28,9 +28,7 @@ const ALLOWED_EXTENSIONS = [".txt", ".md"];
  * Upload a document: validate, insert, chunk, embed, store chunks
  * Cleans up orphan document if embedding fails
  */
-export async function uploadDocument(
-	formData: FormData,
-): Promise<{
+export async function uploadDocument(formData: FormData): Promise<{
 	success: boolean;
 	documentId?: string;
 	chunkCount?: number;
