@@ -47,8 +47,8 @@ This guide walks you through setting up the required external services for the R
 1. In your Supabase dashboard, go to **Settings → API** (left sidebar)
 2. Find **Project URL** - copy this
 3. Find **Project API keys**:
-   - **anon/public** - copy this (safe to use in browser)
-   - **service_role** - copy this (⚠️ NEVER commit to git, server-side only)
+   - **publishable** - copy this (safe to use in browser)
+   - **secret** - copy this (⚠️ NEVER commit to git, server-side only)
 
 ### Step 4: Add Environment Variables
 
@@ -57,8 +57,8 @@ Create (or edit) `.env.local` in the project root:
 ```bash
 # Supabase
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...your-anon-key...
-SUPABASE_SERVICE_ROLE_KEY=eyJ...your-service-role-key...
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...your-publishable-key...
+SUPABASE_SECRET_KEY=sb_secret_...your-secret-key...
 ```
 
 Replace the placeholder values with your actual keys from Step 3.
@@ -107,8 +107,8 @@ OPENAI_API_KEY=sk-proj-...your-actual-key...
 
 # Supabase
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...your-actual-anon-key...
-SUPABASE_SERVICE_ROLE_KEY=eyJ...your-actual-service-key...
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...your-actual-publishable-key...
+SUPABASE_SECRET_KEY=sb_secret_...your-actual-secret-key...
 
 # App (optional, for deployment)
 NEXT_PUBLIC_APP_URL=http://localhost:3000
@@ -186,7 +186,7 @@ Total tokens: 18993
 
 ⚠️ **NEVER commit `.env.local` to git**
 - The `.gitignore` file already excludes it
-- The `SUPABASE_SERVICE_ROLE_KEY` bypasses Row Level Security (RLS)
+- The `SUPABASE_SECRET_KEY` bypasses Row Level Security (RLS)
 - The `OPENAI_API_KEY` can incur charges if leaked
 
 ✅ **Safe to commit:**
@@ -203,7 +203,7 @@ Total tokens: 18993
 
 ### "Failed to insert document" error
 - Check that schema.sql ran successfully (Step 2)
-- Verify `SUPABASE_SERVICE_ROLE_KEY` is correct (not the anon key)
+- Verify `SUPABASE_SECRET_KEY` is correct (not the publishable key)
 
 ### "Failed to generate embeddings" error
 - Check that `OPENAI_API_KEY` is correct
