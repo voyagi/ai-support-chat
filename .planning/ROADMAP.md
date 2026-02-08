@@ -7,12 +7,13 @@ This roadmap delivers a production-ready AI customer support chatbot with RAG ca
 ## Phases
 
 **Phase Numbering:**
+
 - Integer phases (1, 2, 3): Planned milestone work
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Database & RAG Foundation** - Schema, embeddings, chunking, evaluation framework
+- [x] **Phase 1: Database & RAG Foundation** - Schema, embeddings, chunking, evaluation framework
 - [ ] **Phase 2: Admin Panel & Content Upload** - Password gate, document CRUD, FlowBoard demo content
 - [ ] **Phase 3: Chat API & Streaming** - RAG retrieval, streaming responses, conversation persistence
 - [ ] **Phase 4: Full-Page Chat UI** - ChatWindow component, landing page, responsive design
@@ -42,10 +43,10 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 Plans:
 
-- [ ] 01-01-PLAN.md -- Database schema (SQL) + heading-aware markdown chunker with token counting
-- [ ] 01-02-PLAN.md -- FlowBoard test fixtures (10 docs) + evaluation ground truth queries (18 cases)
-- [ ] 01-03-PLAN.md -- Embedding generation, similarity search, and seed script
-- [ ] 01-04-PLAN.md -- Evaluation framework (precision@k, recall@k) + end-to-end pipeline verification
+- [x] 01-01-PLAN.md -- Database schema (SQL) + heading-aware markdown chunker with token counting
+- [x] 01-02-PLAN.md -- FlowBoard test fixtures (10 docs) + evaluation ground truth queries (18 cases)
+- [x] 01-03-PLAN.md -- Embedding generation, similarity search, and seed script
+- [x] 01-04-PLAN.md -- Evaluation framework (precision@k, recall@k) + end-to-end pipeline verification
 
 ### Phase 2: Admin Panel & Content Upload
 
@@ -233,7 +234,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Database & RAG Foundation | 0/4 | Planned | - |
+| 1. Database & RAG Foundation | 4/4 | Complete | 2026-02-08 |
 | 2. Admin Panel & Content Upload | 0/0 | Not started | - |
 | 3. Chat API & Streaming | 0/0 | Not started | - |
 | 4. Full-Page Chat UI | 0/0 | Not started | - |

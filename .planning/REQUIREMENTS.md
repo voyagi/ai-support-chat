@@ -7,10 +7,10 @@
 
 ### RAG Pipeline
 
-- [ ] **RAG-01**: User query is embedded and matched against document chunks via pgvector similarity search
-- [ ] **RAG-02**: Documents are split into ~500 token chunks with overlap during upload
-- [ ] **RAG-03**: Each chunk is embedded via OpenAI text-embedding-3-small and stored with vector
-- [ ] **RAG-04**: Top 3-5 relevant chunks are injected as context into the GPT prompt
+- [x] **RAG-01**: User query is embedded and matched against document chunks via pgvector similarity search
+- [x] **RAG-02**: Documents are split into ~500 token chunks with overlap during upload
+- [x] **RAG-03**: Each chunk is embedded via OpenAI text-embedding-3-small and stored with vector
+- [x] **RAG-04**: Top 3-5 relevant chunks are injected as context into the GPT prompt
 - [ ] **RAG-05**: Bot responses cite which document(s) the answer came from
 - [ ] **RAG-06**: Low-confidence answers trigger inline contact form instead of hallucinated response
 
@@ -99,10 +99,10 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| RAG-01 | Phase 1 | Pending |
-| RAG-02 | Phase 1 | Pending |
-| RAG-03 | Phase 1 | Pending |
-| RAG-04 | Phase 1 | Pending |
+| RAG-01 | Phase 1 | Complete |
+| RAG-02 | Phase 1 | Complete |
+| RAG-03 | Phase 1 | Complete |
+| RAG-04 | Phase 1 | Complete |
 | RAG-05 | Phase 3 | Pending |
 | RAG-06 | Phase 9 | Pending |
 | CHAT-01 | Phase 3 | Pending |
@@ -140,4 +140,4 @@
 
 ---
 *Requirements defined: 2026-02-08*
-*Last updated: 2026-02-08 after roadmap creation*
+*Last updated: 2026-02-08 after Phase 1 completion*
