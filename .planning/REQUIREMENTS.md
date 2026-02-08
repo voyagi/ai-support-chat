@@ -99,14 +99,45 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (Populated during roadmap creation) | | |
+| RAG-01 | Phase 1 | Pending |
+| RAG-02 | Phase 1 | Pending |
+| RAG-03 | Phase 1 | Pending |
+| RAG-04 | Phase 1 | Pending |
+| RAG-05 | Phase 3 | Pending |
+| RAG-06 | Phase 9 | Pending |
+| CHAT-01 | Phase 3 | Pending |
+| CHAT-02 | Phase 3 | Pending |
+| CHAT-03 | Phase 4 | Pending |
+| CHAT-04 | Phase 4 | Pending |
+| CHAT-05 | Phase 4 | Pending |
+| WIDG-01 | Phase 6 | Pending |
+| WIDG-02 | Phase 6 | Pending |
+| WIDG-03 | Phase 6 | Pending |
+| WIDG-04 | Phase 6 | Pending |
+| WIDG-05 | Phase 6 | Pending |
+| ADMN-01 | Phase 2 | Pending |
+| ADMN-02 | Phase 2 | Pending |
+| ADMN-03 | Phase 2 | Pending |
+| ADMN-04 | Phase 2 | Pending |
+| ADMN-05 | Phase 10 | Pending |
+| ADMN-06 | Phase 7 | Pending |
+| ANLY-01 | Phase 8 | Pending |
+| ANLY-02 | Phase 8 | Pending |
+| ANLY-03 | Phase 8 | Pending |
+| LAND-01 | Phase 4 | Pending |
+| LAND-02 | Phase 5 | Pending |
+| LAND-03 | Phase 5 | Pending |
+| LAND-04 | Phase 4 | Pending |
+| LAND-05 | Phase 2 | Pending |
+| DEPL-01 | Phase 10 | Pending |
+| DEPL-02 | Phase 10 | Pending |
 
 **Coverage:**
 
 - v1 requirements: 28 total
-- Mapped to phases: 0
-- Unmapped: 28
+- Mapped to phases: 28
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-08*
-*Last updated: 2026-02-08 after initial definition*
+*Last updated: 2026-02-08 after roadmap creation*
