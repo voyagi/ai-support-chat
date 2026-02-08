@@ -5,34 +5,36 @@
 See: .planning/PROJECT.md (updated 2026-02-08)
 
 **Core value:** A prospect interacts with the demo and thinks "I want this, but for my business"
-**Current focus:** Phase 1 complete, ready for Phase 2
+**Current focus:** Phase 2 in progress -- demo content expansion complete
 
 ## Current Position
 
-Phase: 1 of 10 (Database & RAG Foundation)
-Plan: 4 of 4 in phase
-Status: Phase complete
-Last activity: 2026-02-08 - Completed 01-04-PLAN.md (evaluation framework + E2E verification)
+Phase: 2 of 10 (Admin Panel & Content Upload)
+Plan: 2 of 4 in current phase
+Status: In progress
+Last activity: 2026-02-08 - Completed 02-02-PLAN.md (expand FlowBoard demo content to 18 docs)
 
-Progress: [████░░░░░░] 40%
+Progress: [██████░░░░] 60%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
-- Average duration: 9.3 min
-- Total execution time: 0.62 hours
+
+- Total plans completed: 6
+- Average duration: 8.5 min
+- Total execution time: 0.85 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-database-rag-foundation | 4/4 | 37min | 9.3min |
+| 02-admin-panel-content-upload | 2/4 | 14min | 7min |
 
 **Recent Trend:**
 
-- Last 5 plans: 01-01 (8min), 01-02 (15min), 01-03 (6min), 01-04 (8min)
-- Trend: Consistent ~9min average
+- Last 5 plans: 01-03 (6min), 01-04 (8min), 02-01 (7min), 02-02 (7min)
+- Trend: Consistent ~7min average, accelerating
 
 *Updated after each plan completion*
 
@@ -56,6 +58,11 @@ Recent decisions affecting current work:
 - Relative imports in scripts/ (not @/ aliases) - tsx doesn't reliably resolve tsconfig paths (01-03)
 - Supabase env vars renamed to PUBLISHABLE_KEY/SECRET_KEY - New Supabase convention (01-04)
 - Quality gate thresholds: precision@5 >= 0.7, recall@20 >= 0.8 (01-04)
+- Data Access Layer auth pattern: session verified in Server Components + Server Actions, not just middleware (02-01)
+- Lazy getSessionOptions() instead of module-level constant for iron-session config (02-01)
+- serverActions config under experimental key for Next.js 15.5.x (02-01)
+- FAQ-style docs use ### sub-headings for chunker FAQ detection (02-02)
+- 18 total FlowBoard docs covering all knowledge base categories (02-02)
 
 ### Pending Todos
 
@@ -67,6 +74,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-08 - Phase 1 execution complete
-Stopped at: All 4 plans complete, awaiting phase verification
+Last session: 2026-02-08T15:41:17Z
+Stopped at: Completed 02-01-PLAN.md
 Resume file: None
