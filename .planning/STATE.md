@@ -5,36 +5,36 @@
 See: .planning/PROJECT.md (updated 2026-02-08)
 
 **Core value:** A prospect interacts with the demo and thinks "I want this, but for my business"
-**Current focus:** Phase 2 in progress -- demo content expansion complete
+**Current focus:** Phase 2 in progress -- document management UI complete
 
 ## Current Position
 
 Phase: 2 of 10 (Admin Panel & Content Upload)
-Plan: 2 of 4 in current phase
+Plan: 3 of 4 in current phase
 Status: In progress
-Last activity: 2026-02-08 - Completed 02-02-PLAN.md (expand FlowBoard demo content to 18 docs)
+Last activity: 2026-02-08 - Completed 02-03-PLAN.md (document management UI with upload, table, delete)
 
-Progress: [██████░░░░] 60%
+Progress: [███████░░░] 70%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 6
-- Average duration: 8.5 min
-- Total execution time: 0.85 hours
+- Total plans completed: 7
+- Average duration: 8.4 min
+- Total execution time: 0.98 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-database-rag-foundation | 4/4 | 37min | 9.3min |
-| 02-admin-panel-content-upload | 2/4 | 14min | 7min |
+| 02-admin-panel-content-upload | 3/4 | 22min | 7.3min |
 
 **Recent Trend:**
 
-- Last 5 plans: 01-03 (6min), 01-04 (8min), 02-01 (7min), 02-02 (7min)
-- Trend: Consistent ~7min average, accelerating
+- Last 5 plans: 01-04 (8min), 02-01 (7min), 02-02 (7min), 02-03 (8min)
+- Trend: Consistent ~7.5min average
 
 *Updated after each plan completion*
 
@@ -63,6 +63,9 @@ Recent decisions affecting current work:
 - serverActions config under experimental key for Next.js 15.5.x (02-01)
 - FAQ-style docs use ### sub-headings for chunker FAQ detection (02-02)
 - 18 total FlowBoard docs covering all knowledge base categories (02-02)
+- Sequential file upload to avoid overwhelming OpenAI embedding API (02-03)
+- Orphan cleanup: delete document if embedding fails after insert (02-03)
+- Server Component + Client wrapper pattern for pages needing SSR data + interactivity (02-03)
 
 ### Pending Todos
 
@@ -74,6 +77,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-08T15:41:57Z
-Stopped at: Completed 02-02-PLAN.md
+Last session: 2026-02-08T15:54:29Z
+Stopped at: Completed 02-03-PLAN.md
 Resume file: None
