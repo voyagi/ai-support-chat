@@ -32,10 +32,10 @@
 
 ### Admin Panel
 
-- [ ] **ADMN-01**: Admin panel is protected by a simple shared password
-- [ ] **ADMN-02**: Admin can upload text documents to the knowledge base
-- [ ] **ADMN-03**: Admin can view list of all uploaded documents
-- [ ] **ADMN-04**: Admin can delete documents (cascades to chunks)
+- [x] **ADMN-01**: Admin panel is protected by a simple shared password
+- [x] **ADMN-02**: Admin can upload text documents to the knowledge base
+- [x] **ADMN-03**: Admin can view list of all uploaded documents
+- [x] **ADMN-04**: Admin can delete documents (cascades to chunks)
 - [ ] **ADMN-05**: Admin can toggle "try it yourself" mode for prospect doc uploads
 - [ ] **ADMN-06**: Admin can copy embed code snippet (script tag with syntax highlighting)
 
@@ -51,7 +51,7 @@
 - [ ] **LAND-02**: Dark mode with light/dark toggle and system preference detection
 - [ ] **LAND-03**: Animations and transitions on state changes, message appearances, page loads
 - [ ] **LAND-04**: Responsive design across desktop, tablet, and mobile
-- [ ] **LAND-05**: 15-20 realistic FlowBoard demo documents pre-loaded in knowledge base
+- [x] **LAND-05**: 15-20 realistic FlowBoard demo documents pre-loaded in knowledge base
 
 ### Deployment
 
@@ -115,10 +115,10 @@
 | WIDG-03 | Phase 6 | Pending |
 | WIDG-04 | Phase 6 | Pending |
 | WIDG-05 | Phase 6 | Pending |
-| ADMN-01 | Phase 2 | Pending |
-| ADMN-02 | Phase 2 | Pending |
-| ADMN-03 | Phase 2 | Pending |
-| ADMN-04 | Phase 2 | Pending |
+| ADMN-01 | Phase 2 | Complete |
+| ADMN-02 | Phase 2 | Complete |
+| ADMN-03 | Phase 2 | Complete |
+| ADMN-04 | Phase 2 | Complete |
 | ADMN-05 | Phase 10 | Pending |
 | ADMN-06 | Phase 7 | Pending |
 | ANLY-01 | Phase 8 | Pending |
@@ -128,7 +128,7 @@
 | LAND-02 | Phase 5 | Pending |
 | LAND-03 | Phase 5 | Pending |
 | LAND-04 | Phase 4 | Pending |
-| LAND-05 | Phase 2 | Pending |
+| LAND-05 | Phase 2 | Complete |
 | DEPL-01 | Phase 10 | Pending |
 | DEPL-02 | Phase 10 | Pending |
 
@@ -140,4 +140,4 @@
 
 ---
 *Requirements defined: 2026-02-08*
-*Last updated: 2026-02-08 after Phase 1 completion*
+*Last updated: 2026-02-08 after Phase 2 completion*
