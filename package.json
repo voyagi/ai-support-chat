@@ -8,7 +8,9 @@
 		"start": "next start",
 		"check": "biome check --write .",
 		"lint": "biome lint --write .",
-		"format": "biome format --write ."
+		"format": "biome format --write .",
+		"seed": "npx tsx --env-file=.env.local scripts/seed.ts",
+		"evaluate": "npx tsx --env-file=.env.local scripts/evaluate.ts"
 	},
 	"dependencies": {
 		"@supabase/ssr": "^0.6.1",
@@ -29,6 +31,7 @@
 		"@types/react": "^19.1.2",
 		"@types/react-dom": "^19.1.2",
 		"tailwindcss": "^4.1.4",
+		"tsx": "^4.19.2",
 		"typescript": "^5.8.3"
 	}
 }
