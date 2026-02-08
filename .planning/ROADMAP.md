@@ -14,7 +14,7 @@ This roadmap delivers a production-ready AI customer support chatbot with RAG ca
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Database & RAG Foundation** - Schema, embeddings, chunking, evaluation framework
-- [ ] **Phase 2: Admin Panel & Content Upload** - Password gate, document CRUD, FlowBoard demo content
+- [x] **Phase 2: Admin Panel & Content Upload** - Password gate, document CRUD, FlowBoard demo content
 - [ ] **Phase 3: Chat API & Streaming** - RAG retrieval, streaming responses, conversation persistence
 - [ ] **Phase 4: Full-Page Chat UI** - ChatWindow component, landing page, responsive design
 - [ ] **Phase 5: Dark Mode & Polish** - Theme system, animations, transitions, micro-interactions
@@ -66,9 +66,9 @@ Plans:
 Plans:
 
 - [x] 02-01-PLAN.md -- Auth gate with iron-session (login page, middleware, session management)
-- [ ] 02-02-PLAN.md -- FlowBoard content expansion (8 new docs to reach 18 total)
-- [ ] 02-03-PLAN.md -- Document management (upload, list, delete, chunk preview, admin dashboard)
-- [ ] 02-04-PLAN.md -- E2E verification (seed database, human-verify full admin flow)
+- [x] 02-02-PLAN.md -- FlowBoard content expansion (8 new docs to reach 18 total)
+- [x] 02-03-PLAN.md -- Document management (upload, list, delete, chunk preview, admin dashboard)
+- [x] 02-04-PLAN.md -- E2E verification (seed database, human-verify full admin flow)
 
 ### Phase 3: Chat API & Streaming
 
@@ -237,7 +237,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Database & RAG Foundation | 4/4 | Complete | 2026-02-08 |
-| 2. Admin Panel & Content Upload | 1/4 | In progress | - |
+| 2. Admin Panel & Content Upload | 4/4 | Complete | 2026-02-08 |
 | 3. Chat API & Streaming | 0/0 | Not started | - |
 | 4. Full-Page Chat UI | 0/0 | Not started | - |
 | 5. Dark Mode & Polish | 0/0 | Not started | - |
