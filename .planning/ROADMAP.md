@@ -164,11 +164,12 @@ Plans:
   4. Live preview shows widget as it would appear on external site
   5. Instructions explain where to paste code in website HTML
 
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
 
-- [ ] 07-01: TBD
+- [ ] 07-01-PLAN.md -- Embed page components (ConfigPanel, CodeBlock, BrowserPreview, EmbedPage) + page route + admin navigation
+- [ ] 07-02-PLAN.md -- Widget CONFIG_UPDATE postMessage handler + end-to-end human verification
 
 ### Phase 8: Analytics Dashboard
 
