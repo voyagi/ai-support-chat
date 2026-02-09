@@ -4,6 +4,7 @@ import { Chat, useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { Bot, RefreshCw } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { cn } from "@/lib/cn";
 import { ThemeToggle } from "../ui/ThemeToggle";
 import { ChatInput } from "./ChatInput";
 import { MessageBubble } from "./MessageBubble";
@@ -16,6 +17,10 @@ interface Source {
 	similarity: number;
 }
 
+interface ChatWindowProps {
+	widget?: boolean;
+}
+
 // Helper to extract text content from UIMessage parts
 function getMessageText(message: {
 	parts: Array<{ type: string; text?: string }>;
@@ -26,7 +31,7 @@ function getMessageText(message: {
 		.join("");
 }
 
-export function ChatWindow() {
+export function ChatWindow({ widget = false }: ChatWindowProps) {
 	const conversationIdRef = useRef<string | null>(null);
 	const [sourcesMap, setSourcesMap] = useState<Record<string, Source[]>>({});
 	const bottomRef = useRef<HTMLDivElement>(null);
@@ -135,31 +140,33 @@ export function ChatWindow() {
 	const showMessageLimitWarning = messageCount >= 30;
 
 	return (
-		<div className="flex flex-col h-screen">
+		<div className={cn("flex flex-col", widget ? "h-full" : "h-screen")}>
 			{/* Header */}
-			<header className="border-b dark:border-gray-700 bg-white dark:bg-gray-900 py-3 px-4 md:py-4">
-				<div className="max-w-3xl mx-auto">
-					<div className="flex items-center justify-between gap-3">
-						<div className="flex items-center gap-3">
-							<div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center">
-								<Bot size={24} />
+			{!widget && (
+				<header className="border-b dark:border-gray-700 bg-white dark:bg-gray-900 py-3 px-4 md:py-4">
+					<div className="max-w-3xl mx-auto">
+						<div className="flex items-center justify-between gap-3">
+							<div className="flex items-center gap-3">
+								<div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+									<Bot size={24} />
+								</div>
+								<div>
+									<h1 className="text-lg md:text-xl font-semibold text-gray-900 dark:text-gray-100">
+										Flo
+									</h1>
+									<p className="text-xs md:text-sm text-gray-600 dark:text-gray-400">
+										FlowBoard AI Support
+									</p>
+								</div>
 							</div>
-							<div>
-								<h1 className="text-lg md:text-xl font-semibold text-gray-900 dark:text-gray-100">
-									Flo
-								</h1>
-								<p className="text-xs md:text-sm text-gray-600 dark:text-gray-400">
-									FlowBoard AI Support
-								</p>
-							</div>
+							<ThemeToggle />
 						</div>
-						<ThemeToggle />
+						<p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
+							AI assistant — answers based on documentation
+						</p>
 					</div>
-					<p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
-						AI assistant — answers based on documentation
-					</p>
-				</div>
-			</header>
+				</header>
+			)}
 
 			{/* Messages Area */}
 			<div className="flex-1 overflow-y-auto">
