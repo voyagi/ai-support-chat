@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-02-08)
 ## Current Position
 
 Phase: 6 of 10 (Embeddable Widget)
-Plan: 1 of 3 in current phase
+Plan: 2 of 3 in current phase
 Status: In progress
-Last activity: 2026-02-09 - Completed 06-01-PLAN.md (Widget iframe page with postMessage)
+Last activity: 2026-02-09 - Completed 06-02-PLAN.md (Widget loader IIFE + Rollup build)
 
 Progress: [█████████████░░░░░░░] 68% (15 of ~22 plans)
 
@@ -33,12 +33,12 @@ Progress: [█████████████░░░░░░░] 68% (15
 | 03-chat-api-streaming | 2/2 | 11min | 5.5min |
 | 04-full-page-chat-ui | 2/2 | 18min | 9.0min |
 | 05-dark-mode-polish | 2/2 | 17min | 8.5min |
-| 06-embeddable-widget | 1/3 | 3min | 3.0min |
+| 06-embeddable-widget | 2/3 | 7min | 3.5min |
 
 ### Recent Trend
 
-- Last 5 plans: 04-02 (25min), 05-01 (5min), 05-02 (12min), 06-01 (3min)
-- Trend: Phase 6 started. Widget iframe page shipped with postMessage protocol. Fast execution due to well-scoped plan.
+- Last 5 plans: 05-01 (5min), 05-02 (12min), 06-01 (3min), 06-02 (4min)
+- Trend: Phase 6 in progress. Widget iframe + loader shipped. Excellent velocity (3.5min avg). Rollup bundling at 2.9KB.
 
 *Updated after each plan completion*
 
@@ -103,6 +103,8 @@ Recent decisions affecting current work:
 - postMessage protocol with origin validation - iframe→parent uses '*', parent→iframe validates origin (06-01)
 - ResizeObserver on document.body for iframe height tracking - Enables dynamic iframe sizing (06-01)
 - Widget layout does NOT duplicate ThemeProvider - Root layout already wraps /widget route (06-01)
+- [Phase 06-02]: Vanilla TypeScript IIFE for widget loader (no React/Next.js deps) ensures max compatibility — Works on any website, 2.9KB bundle size
+- [Phase 06-02]: Inline styles only (no CSS classes) to prevent host page style conflicts — Object.assign pattern with ai-chat-widget-* prefixed IDs
 
 ### Pending Todos
 
@@ -114,6 +116,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-09T12:50:47Z
-Stopped at: Completed 06-01-PLAN.md (Widget iframe page with postMessage)
+Last session: 2026-02-09T12:51:55Z
+Stopped at: Completed 06-02-PLAN.md (Widget loader IIFE + Rollup build)
 Resume file: None
