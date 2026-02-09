@@ -184,12 +184,12 @@ Plans:
   4. Charts visualize trends over time (daily/weekly conversation volume)
   5. Metrics update in real-time as new conversations occur
 
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
 
-- [ ] 08-01: TBD
-- [ ] 08-02: TBD
+- [ ] 08-01-PLAN.md -- Backend foundation: schema changes (answered_from_kb column, get_chat_volume RPC), accuracy tracking in chat API, analytics query lib, API routes, Recharts + date-fns install, seed data script
+- [ ] 08-02-PLAN.md -- Dashboard UI: ChatVolumeChart, AccuracyMetrics, RealtimeMetrics, RecentQuestions components, analytics page, admin nav link, human verification
 
 ### Phase 9: Out-of-KB Handling
 
