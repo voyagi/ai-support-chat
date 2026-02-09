@@ -111,6 +111,7 @@ Recent decisions affecting current work:
 - [Phase 07-01]: Hand-rolled HTML tokenizer for syntax highlighting — Keeps bundle small, dark background fixed (not theme-dependent)
 - [Phase 07-01]: useId for form element IDs — Ensures accessibility when component used multiple times
 - [Phase 07-01]: postMessage config updates to iframe widget — BrowserPreview sends config on load and state changes
+- [Phase 07-embed-code-generator]: CONFIG_UPDATE handler updates theme only (position/greeting are loader concerns, not iframe concerns)
 
 ### Pending Todos
 
