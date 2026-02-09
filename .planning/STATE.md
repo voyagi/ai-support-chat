@@ -5,24 +5,24 @@
 See: .planning/PROJECT.md (updated 2026-02-08)
 
 **Core value:** A prospect interacts with the demo and thinks "I want this, but for my business"
-**Current focus:** Phase 3 complete -- ready for Phase 4 (Full-Page Chat UI)
+**Current focus:** Phase 4 in progress -- Full-Page Chat UI (1 of 2 plans complete)
 
 ## Current Position
 
-Phase: 3 of 10 (Chat API & Streaming)
-Plan: 2 of 2 in current phase
-Status: Phase complete
-Last activity: 2026-02-09 - Completed 03-02-PLAN.md (Streaming chat API endpoint)
+Phase: 4 of 10 (Full-Page Chat UI)
+Plan: 1 of 2 in current phase
+Status: In progress
+Last activity: 2026-02-09 - Completed 04-01-PLAN.md (Chat UI component tree and /chat page)
 
-Progress: [█████████░░░░░░░░░░░] 45% (10 of ~22 plans)
+Progress: [█████████░░░░░░░░░░░] 50% (11 of ~22 plans)
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 10
-- Average duration: 8.1 min
-- Total execution time: 1.42 hours
+- Total plans completed: 11
+- Average duration: 8.5 min
+- Total execution time: 1.69 hours
 
 **By Phase:**
 
@@ -31,11 +31,12 @@ Progress: [█████████░░░░░░░░░░░] 45% (10
 | 01-database-rag-foundation | 4/4 | 37min | 9.3min |
 | 02-admin-panel-content-upload | 4/4 | 57min | 14.3min |
 | 03-chat-api-streaming | 2/2 | 11min | 5.5min |
+| 04-full-page-chat-ui | 1/2 | 16min | 16.0min |
 
 **Recent Trend:**
 
-- Last 5 plans: 02-03 (8min), 02-04 (~35min incl. human verification), 03-01 (4min), 03-02 (7min)
-- Trend: Phase 3 very efficient (avg 5.5min), shorter than overall avg (8.1min)
+- Last 5 plans: 02-04 (~35min), 03-01 (4min), 03-02 (7min), 04-01 (16min)
+- Trend: Phase 4 started, 16min for UI implementation with AI SDK v6 integration
 
 *Updated after each plan completion*
 
@@ -78,6 +79,13 @@ Recent decisions affecting current work:
 - Conversation creation before streaming - Prevents race conditions in fire-and-forget persistence (03-02)
 - Fire-and-forget persistence pattern - onFinish callback doesn't block stream, logs errors only (03-02)
 - Custom headers for metadata (X-Conversation-Id, X-Sources) - Simple metadata transport without data stream complexity (03-02)
+- AI SDK v6 uses Chat + DefaultChatTransport pattern - useChat accepts {chat: Chat} not direct API config (04-01)
+- UIMessage has parts array not content string - Created getMessageText helper to extract text (04-01)
+- sendMessage expects {text: string} format - Not {role, content} structure (04-01)
+- IntersectionObserver-based auto-scroll - Only scrolls when user at bottom, respects manual scrolling (04-01)
+- Message limit warning at 30 messages - Prevents hitting 50-message API cap with buffer (04-01)
+- Citation sources with expandable UI - Collapsed by default, shows title/heading/snippet/similarity (04-01)
+- Bot identity in header (Flo name + avatar) - Consistent branding across UI (04-01)
 
 ### Pending Todos
 
@@ -89,6 +97,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-09T06:46:24Z
-Stopped at: Completed 03-02-PLAN.md (Streaming chat API endpoint) - Phase 3 complete
+Last session: 2026-02-09T07:48:46Z
+Stopped at: Completed 04-01-PLAN.md (Chat UI component tree and /chat page) - Phase 4 in progress (1 of 2)
 Resume file: None
