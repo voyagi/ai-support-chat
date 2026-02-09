@@ -240,7 +240,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 2. Admin Panel & Content Upload | 4/4 | Complete | 2026-02-08 |
 | 3. Chat API & Streaming | 2/2 | Complete | 2026-02-09 |
 | 4. Full-Page Chat UI | 2/2 | Complete | 2026-02-09 |
-| 5. Dark Mode & Polish | 0/0 | Not started | - |
+| 5. Dark Mode & Polish | 2/2 | Complete | 2026-02-09 |
 | 6. Embeddable Widget | 0/0 | Not started | - |
 | 7. Embed Code Generator | 0/0 | Not started | - |
 | 8. Analytics Dashboard | 0/0 | Not started | - |
