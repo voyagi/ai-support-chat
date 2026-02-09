@@ -10,19 +10,19 @@ See: .planning/PROJECT.md (updated 2026-02-08)
 ## Current Position
 
 Phase: 6 of 10 (Embeddable Widget)
-Plan: 2 of 3 in current phase
-Status: In progress
-Last activity: 2026-02-09 - Completed 06-02-PLAN.md (Widget loader IIFE + Rollup build)
+Plan: 3 of 3 in current phase
+Status: Complete
+Last activity: 2026-02-09 - Completed 06-03-PLAN.md (Widget integration with HTTP headers)
 
-Progress: [█████████████░░░░░░░] 68% (15 of ~22 plans)
+Progress: [██████████████░░░░░░] 73% (16 of ~22 plans)
 
 ## Performance Metrics
 
 ### Velocity
 
-- Total plans completed: 15
-- Average duration: 7.3 min
-- Total execution time: 2.02 hours
+- Total plans completed: 16
+- Average duration: 7.1 min
+- Total execution time: 2.10 hours
 
 ### By Phase
 
@@ -33,12 +33,12 @@ Progress: [█████████████░░░░░░░] 68% (15
 | 03-chat-api-streaming | 2/2 | 11min | 5.5min |
 | 04-full-page-chat-ui | 2/2 | 18min | 9.0min |
 | 05-dark-mode-polish | 2/2 | 17min | 8.5min |
-| 06-embeddable-widget | 2/3 | 7min | 3.5min |
+| 06-embeddable-widget | 3/3 | 12min | 4.0min |
 
 ### Recent Trend
 
-- Last 5 plans: 05-01 (5min), 05-02 (12min), 06-01 (3min), 06-02 (4min)
-- Trend: Phase 6 in progress. Widget iframe + loader shipped. Excellent velocity (3.5min avg). Rollup bundling at 2.9KB.
+- Last 5 plans: 05-02 (12min), 06-01 (3min), 06-02 (4min), 06-03 (5min)
+- Trend: Phase 6 complete! Embeddable widget fully integrated and verified. Outstanding velocity (4.0min avg). Widget is production-ready.
 
 *Updated after each plan completion*
 
@@ -105,6 +105,8 @@ Recent decisions affecting current work:
 - Widget layout does NOT duplicate ThemeProvider - Root layout already wraps /widget route (06-01)
 - [Phase 06-02]: Vanilla TypeScript IIFE for widget loader (no React/Next.js deps) ensures max compatibility — Works on any website, 2.9KB bundle size
 - [Phase 06-02]: Inline styles only (no CSS classes) to prevent host page style conflicts — Object.assign pattern with ai-chat-widget-* prefixed IDs
+- [Phase 06-03]: Route-specific permissive headers (X-Frame-Options ALLOWALL, CSP frame-ancestors *, CORS *) only on /widget and /widget.js — Rest of app keeps restrictive security headers
+- [Phase 06-03]: Console Ninja dev tool interference with widget.js documented as local-only issue (production builds unaffected)
 
 ### Pending Todos
 
@@ -116,6 +118,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-09T12:51:55Z
-Stopped at: Completed 06-02-PLAN.md (Widget loader IIFE + Rollup build)
+Last session: 2026-02-09T13:58:01Z
+Stopped at: Completed 06-03-PLAN.md (Widget integration with HTTP headers) - Phase 6 complete
 Resume file: None
