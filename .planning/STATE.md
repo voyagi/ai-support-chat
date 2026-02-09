@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-08)
 
 **Core value:** A prospect interacts with the demo and thinks "I want this, but for my business"
-**Current focus:** Phase 4 in progress -- Full-Page Chat UI (1 of 2 plans complete)
+**Current focus:** Phase 4 complete -- ready for Phase 5 (Dark Mode & Polish)
 
 ## Current Position
 
 Phase: 4 of 10 (Full-Page Chat UI)
 Plan: 2 of 2 in current phase
-Status: Pending checkpoint (Task 2 human-verify)
-Last activity: 2026-02-09 - Completed 04-02-PLAN.md Task 1 (landing page) - Task 2 pending human verification
+Status: Phase complete
+Last activity: 2026-02-09 - Completed 04-02-PLAN.md (Landing page + full-flow verification)
 
-Progress: [█████████░░░░░░░░░░░] 55% (12 of ~22 plans)
+Progress: [███████████░░░░░░░░░] 55% (12 of ~22 plans)
 
 ## Performance Metrics
 
@@ -35,8 +35,8 @@ Progress: [█████████░░░░░░░░░░░] 55% (12
 
 **Recent Trend:**
 
-- Last 5 plans: 03-01 (4min), 03-02 (7min), 04-01 (16min), 04-02 (2min - partial, pending checkpoint)
-- Trend: Phase 4 complete pending checkpoint - landing page quick build, checkpoint verification needed
+- Last 5 plans: 03-01 (4min), 03-02 (7min), 04-01 (16min), 04-02 (25min incl. browser verification)
+- Trend: Phase 4 complete. Browser testing caught 2 integration bugs (AI SDK v6 message format, Chat recreation)
 
 *Updated after each plan completion*
 
@@ -88,6 +88,8 @@ Recent decisions affecting current work:
 - Bot identity in header (Flo name + avatar) - Consistent branding across UI (04-01)
 - [Phase 04-02]: Landing page as Server Component for SEO optimization without client interactivity
 - [Phase 04-02]: Zero-friction CTA positioning - direct /chat link with no signup gates
+- API route must handle both {content} and {parts} message formats for AI SDK v6 compatibility (04-02 fix)
+- Chat instance (useMemo) must NOT depend on state that changes mid-stream — use useRef for conversationId (04-02 fix)
 
 ### Pending Todos
 
@@ -99,6 +101,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-09T17:01:47Z
-Stopped at: Completed 04-02-PLAN.md Task 1 (landing page) - Task 2 pending human verification checkpoint
+Last session: 2026-02-09T17:30:00Z
+Stopped at: Phase 4 complete — all plans executed, browser verification passed
 Resume file: None

@@ -15,8 +15,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Database & RAG Foundation** - Schema, embeddings, chunking, evaluation framework
 - [x] **Phase 2: Admin Panel & Content Upload** - Password gate, document CRUD, FlowBoard demo content
-- [ ] **Phase 3: Chat API & Streaming** - RAG retrieval, streaming responses, conversation persistence
-- [ ] **Phase 4: Full-Page Chat UI** - ChatWindow component, landing page, responsive design
+- [x] **Phase 3: Chat API & Streaming** - RAG retrieval, streaming responses, conversation persistence
+- [x] **Phase 4: Full-Page Chat UI** - ChatWindow component, landing page, responsive design
 - [ ] **Phase 5: Dark Mode & Polish** - Theme system, animations, transitions, micro-interactions
 - [ ] **Phase 6: Embeddable Widget** - Widget page, loader script, iframe isolation
 - [ ] **Phase 7: Embed Code Generator** - Admin copy-paste snippet, syntax highlighting, preview
@@ -107,8 +107,8 @@ Plans:
 
 Plans:
 
-- [ ] 04-01-PLAN.md -- Chat UI components (MessageBubble, ChatInput, TypingIndicator, MessageSkeleton, ChatWindow) + /chat page with useChat integration
-- [ ] 04-02-PLAN.md -- Landing page with zero-friction demo CTA + full-flow human verification
+- [x] 04-01-PLAN.md -- Chat UI components (MessageBubble, ChatInput, TypingIndicator, MessageSkeleton, ChatWindow) + /chat page with useChat integration
+- [x] 04-02-PLAN.md -- Landing page with zero-friction demo CTA + full-flow human verification
 
 ### Phase 5: Dark Mode & Polish
 
@@ -239,7 +239,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 1. Database & RAG Foundation | 4/4 | Complete | 2026-02-08 |
 | 2. Admin Panel & Content Upload | 4/4 | Complete | 2026-02-08 |
 | 3. Chat API & Streaming | 2/2 | Complete | 2026-02-09 |
-| 4. Full-Page Chat UI | 0/0 | Not started | - |
+| 4. Full-Page Chat UI | 2/2 | Complete | 2026-02-09 |
 | 5. Dark Mode & Polish | 0/0 | Not started | - |
 | 6. Embeddable Widget | 0/0 | Not started | - |
 | 7. Embed Code Generator | 0/0 | Not started | - |
