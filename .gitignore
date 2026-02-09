@@ -15,6 +15,9 @@
 /.next/
 /out/
 
+# widget build artifact
+/public/widget.js
+
 # production
 /build
 

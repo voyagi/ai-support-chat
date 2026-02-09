@@ -4,7 +4,8 @@
 	"private": true,
 	"scripts": {
 		"dev": "next dev --turbopack",
-		"build": "next build",
+		"build": "rollup -c rollup.config.mjs && next build",
+		"build:widget": "rollup -c rollup.config.mjs",
 		"start": "next start",
 		"check": "biome check --write .",
 		"lint": "biome lint --write .",
@@ -33,11 +34,14 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.0.0",
+		"@rollup/plugin-terser": "^0.4.4",
+		"@rollup/plugin-typescript": "^12.3.0",
 		"@tailwindcss/postcss": "^4.1.4",
 		"@types/node": "^22.15.0",
 		"@types/react": "^19.1.2",
 		"@types/react-dom": "^19.1.2",
 		"playwright": "^1.58.2",
+		"rollup": "^4.57.1",
 		"tailwindcss": "^4.1.4",
 		"tsx": "^4.19.2",
 		"typescript": "^5.8.3"
