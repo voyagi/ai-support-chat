@@ -83,12 +83,12 @@ Plans:
   4. Streaming works token-by-token without blocking on database writes
   5. API handles mid-stream errors gracefully with retry capability
 
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
 
-- [ ] 03-01: TBD
-- [ ] 03-02: TBD
+- [ ] 03-01-PLAN.md -- Chat infrastructure modules (system prompt, context builder, conversation persistence)
+- [ ] 03-02-PLAN.md -- Streaming chat API route (RAG + streaming + citations + abort + persistence)
 
 ### Phase 4: Full-Page Chat UI
 
