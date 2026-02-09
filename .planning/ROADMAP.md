@@ -19,7 +19,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 4: Full-Page Chat UI** - ChatWindow component, landing page, responsive design
 - [ ] **Phase 5: Dark Mode & Polish** - Theme system, animations, transitions, micro-interactions
 - [ ] **Phase 6: Embeddable Widget** - Widget page, loader script, iframe isolation
-- [ ] **Phase 7: Embed Code Generator** - Admin copy-paste snippet, syntax highlighting, preview
+- [x] **Phase 7: Embed Code Generator** - Admin copy-paste snippet, syntax highlighting, preview
 - [ ] **Phase 8: Analytics Dashboard** - Chat volume, common questions, accuracy tracking
 - [ ] **Phase 9: Out-of-KB Handling** - Contact form fallback, confidence thresholds, hallucination prevention
 - [ ] **Phase 10: Production Hardening** - Rate limiting, cost controls, deployment to Vercel
@@ -168,8 +168,8 @@ Plans:
 
 Plans:
 
-- [ ] 07-01-PLAN.md -- Embed page components (ConfigPanel, CodeBlock, BrowserPreview, EmbedPage) + page route + admin navigation
-- [ ] 07-02-PLAN.md -- Widget CONFIG_UPDATE postMessage handler + end-to-end human verification
+- [x] 07-01-PLAN.md -- Embed page components (ConfigPanel, CodeBlock, BrowserPreview, EmbedPage) + page route + admin navigation
+- [x] 07-02-PLAN.md -- Widget CONFIG_UPDATE postMessage handler + end-to-end human verification
 
 ### Phase 8: Analytics Dashboard
 
@@ -243,8 +243,8 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 3. Chat API & Streaming | 2/2 | Complete | 2026-02-09 |
 | 4. Full-Page Chat UI | 2/2 | Complete | 2026-02-09 |
 | 5. Dark Mode & Polish | 2/2 | Complete | 2026-02-09 |
-| 6. Embeddable Widget | 0/0 | Not started | - |
-| 7. Embed Code Generator | 0/0 | Not started | - |
+| 6. Embeddable Widget | 3/3 | Complete | 2026-02-09 |
+| 7. Embed Code Generator | 2/2 | Complete | 2026-02-09 |
 | 8. Analytics Dashboard | 0/0 | Not started | - |
 | 9. Out-of-KB Handling | 0/0 | Not started | - |
 | 10. Production Hardening | 0/0 | Not started | - |
