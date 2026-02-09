@@ -9,20 +9,20 @@ See: .planning/PROJECT.md (updated 2026-02-08)
 
 ## Current Position
 
-Phase: 4 of 10 (Full-Page Chat UI)
-Plan: 2 of 2 in current phase
-Status: Phase complete
-Last activity: 2026-02-09 - Completed 04-02-PLAN.md (Landing page + full-flow verification)
+Phase: 5 of 10 (Dark Mode & Polish)
+Plan: 1 of 2 in current phase
+Status: In progress
+Last activity: 2026-02-09 - Completed 05-01-PLAN.md (Dark mode infrastructure + styling)
 
-Progress: [███████████░░░░░░░░░] 55% (12 of ~22 plans)
+Progress: [███████████░░░░░░░░░] 59% (13 of ~22 plans)
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 12
-- Average duration: 7.8 min
-- Total execution time: 1.72 hours
+- Total plans completed: 13
+- Average duration: 7.5 min
+- Total execution time: 1.80 hours
 
 **By Phase:**
 
@@ -32,11 +32,12 @@ Progress: [███████████░░░░░░░░░] 55% (12
 | 02-admin-panel-content-upload | 4/4 | 57min | 14.3min |
 | 03-chat-api-streaming | 2/2 | 11min | 5.5min |
 | 04-full-page-chat-ui | 2/2 | 18min | 9.0min |
+| 05-dark-mode-polish | 1/2 | 5min | 5.0min |
 
 **Recent Trend:**
 
-- Last 5 plans: 03-01 (4min), 03-02 (7min), 04-01 (16min), 04-02 (25min incl. browser verification)
-- Trend: Phase 4 complete. Browser testing caught 2 integration bugs (AI SDK v6 message format, Chat recreation)
+- Last 5 plans: 03-02 (7min), 04-01 (16min), 04-02 (25min incl. browser verification), 05-01 (5min)
+- Trend: Phase 5 started. Dark mode infrastructure + styling completed efficiently.
 
 *Updated after each plan completion*
 
@@ -90,6 +91,9 @@ Recent decisions affecting current work:
 - [Phase 04-02]: Zero-friction CTA positioning - direct /chat link with no signup gates
 - API route must handle both {content} and {parts} message formats for AI SDK v6 compatibility (04-02 fix)
 - Chat instance (useMemo) must NOT depend on state that changes mid-stream — use useRef for conversationId (04-02 fix)
+- Tailwind v4 @custom-variant for dark mode with data-theme attribute - Cleaner SSR/hydration than class strategy (05-01)
+- Theme transitions via scoped .theme-transition utility - Prevents overriding component-specific transitions (05-01)
+- Fixed top-right ThemeToggle on landing page - Non-intrusive, accessible, follows standard UX patterns (05-01)
 
 ### Pending Todos
 
@@ -101,6 +105,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-09T17:30:00Z
-Stopped at: Phase 4 complete — all plans executed, browser verification passed
+Last session: 2026-02-09T10:34:51Z
+Stopped at: Completed 05-01-PLAN.md (Dark mode infrastructure + styling for chat and landing page)
 Resume file: None
