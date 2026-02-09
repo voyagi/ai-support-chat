@@ -13,6 +13,7 @@
 		"evaluate": "npx tsx --env-file=.env.local scripts/evaluate.ts"
 	},
 	"dependencies": {
+		"@ai-sdk/openai": "^3.0.26",
 		"@supabase/ssr": "^0.6.1",
 		"@supabase/supabase-js": "^2.49.4",
 		"ai": "^6.0.77",
