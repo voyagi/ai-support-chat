@@ -5,24 +5,24 @@
 See: .planning/PROJECT.md (updated 2026-02-08)
 
 **Core value:** A prospect interacts with the demo and thinks "I want this, but for my business"
-**Current focus:** Phase 4 complete -- ready for Phase 5 (Dark Mode & Polish)
+**Current focus:** Phase 5 complete -- ready for Phase 6 (Embeddable Widget)
 
 ## Current Position
 
 Phase: 5 of 10 (Dark Mode & Polish)
-Plan: 1 of 2 in current phase
-Status: In progress
-Last activity: 2026-02-09 - Completed 05-01-PLAN.md (Dark mode infrastructure + styling)
+Plan: 2 of 2 in current phase
+Status: Phase complete
+Last activity: 2026-02-09 - Completed 05-02-PLAN.md (Admin dark mode + animations + verification)
 
-Progress: [███████████░░░░░░░░░] 59% (13 of ~22 plans)
+Progress: [████████████░░░░░░░░] 64% (14 of ~22 plans)
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 13
-- Average duration: 7.5 min
-- Total execution time: 1.80 hours
+- Total plans completed: 14
+- Average duration: 7.6 min
+- Total execution time: 1.97 hours
 
 **By Phase:**
 
@@ -32,12 +32,12 @@ Progress: [███████████░░░░░░░░░] 59% (13
 | 02-admin-panel-content-upload | 4/4 | 57min | 14.3min |
 | 03-chat-api-streaming | 2/2 | 11min | 5.5min |
 | 04-full-page-chat-ui | 2/2 | 18min | 9.0min |
-| 05-dark-mode-polish | 1/2 | 5min | 5.0min |
+| 05-dark-mode-polish | 2/2 | 17min | 8.5min |
 
 **Recent Trend:**
 
-- Last 5 plans: 03-02 (7min), 04-01 (16min), 04-02 (25min incl. browser verification), 05-01 (5min)
-- Trend: Phase 5 started. Dark mode infrastructure + styling completed efficiently.
+- Last 5 plans: 04-01 (16min), 04-02 (25min incl. browser verification), 05-01 (5min), 05-02 (12min incl. human verification)
+- Trend: Phase 5 complete. Dark mode + animations shipped across all pages. Human verification caught 4 minor contrast/FOUC issues, all fixed.
 
 *Updated after each plan completion*
 
@@ -94,6 +94,10 @@ Recent decisions affecting current work:
 - Tailwind v4 @custom-variant for dark mode with data-theme attribute - Cleaner SSR/hydration than class strategy (05-01)
 - Theme transitions via scoped .theme-transition utility - Prevents overriding component-specific transitions (05-01)
 - Fixed top-right ThemeToggle on landing page - Non-intrusive, accessible, follows standard UX patterns (05-01)
+- Body bg-white/dark:bg-gray-900 prevents FOUC flash on initial paint (05-02 fix)
+- Motion fade-in y:12 300ms easeOut for message bubbles - Subtle premium feel (05-02)
+- Scale micro-interactions only on primary CTAs (1.02x/0.98x) - Polish without being gimmicky (05-02)
+- Global prefers-reduced-motion override with !important - Ensures no animation leaks for accessibility (05-02)
 
 ### Pending Todos
 
@@ -105,6 +109,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-09T10:34:51Z
-Stopped at: Completed 05-01-PLAN.md (Dark mode infrastructure + styling for chat and landing page)
+Last session: 2026-02-09T11:30:00Z
+Stopped at: Phase 5 complete — all plans executed, human verification passed
 Resume file: None
