@@ -75,7 +75,7 @@ export function MessageBubble({ role, content, sources }: MessageBubbleProps) {
 								{sources.map((source, idx) => (
 									<div
 										key={`${source.title}-${idx}`}
-										className="bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-md p-3 text-sm"
+										className="bg-white dark:bg-gray-700/60 border border-gray-200 dark:border-gray-600 rounded-md p-3 text-sm"
 									>
 										<p className="font-semibold text-gray-900 dark:text-gray-100">
 											{source.title}

@@ -138,14 +138,14 @@ function StatusBadge({
 			);
 		case "processing":
 			return (
-				<span className="inline-flex items-center gap-1 text-xs text-amber-600">
+				<span className="inline-flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400">
 					<Loader2 className="h-3.5 w-3.5 animate-spin" />
 					Processing...
 				</span>
 			);
 		case "ready":
 			return (
-				<span className="inline-flex items-center gap-1 text-xs text-green-600">
+				<span className="inline-flex items-center gap-1 text-xs text-green-600 dark:text-green-400">
 					<CheckCircle className="h-3.5 w-3.5" />
 					Ready
 				</span>
@@ -153,7 +153,7 @@ function StatusBadge({
 		case "failed":
 			return (
 				<span
-					className="inline-flex items-center gap-1 text-xs text-red-600"
+					className="inline-flex items-center gap-1 text-xs text-red-600 dark:text-red-400"
 					title={error}
 				>
 					<XCircle className="h-3.5 w-3.5" />
