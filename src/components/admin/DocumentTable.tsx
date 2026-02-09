@@ -141,9 +141,9 @@ export function DocumentTable({
 
 	if (documents.length === 0) {
 		return (
-			<div className="rounded-xl border border-dashed border-gray-300 bg-white p-12 text-center">
-				<FileText className="h-10 w-10 text-gray-300 mx-auto mb-3" />
-				<p className="text-sm text-gray-500">
+			<div className="rounded-xl border border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 p-12 text-center">
+				<FileText className="h-10 w-10 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
+				<p className="text-sm text-gray-500 dark:text-gray-400">
 					No documents yet. Upload your first document above.
 				</p>
 			</div>
@@ -151,9 +151,9 @@ export function DocumentTable({
 	}
 
 	return (
-		<div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
-			<table className="w-full divide-y divide-gray-200">
-				<thead className="bg-gray-50">
+		<div className="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+			<table className="w-full divide-y divide-gray-200 dark:divide-gray-700">
+				<thead className="bg-gray-50 dark:bg-gray-800/50">
 					<tr>
 						<th className="w-8 px-4 py-3" />
 						<SortableHeader
@@ -180,7 +180,7 @@ export function DocumentTable({
 						<th className="w-12 px-4 py-3" />
 					</tr>
 				</thead>
-				<tbody className="divide-y divide-gray-200">
+				<tbody className="divide-y divide-gray-200 dark:divide-gray-700">
 					{sorted.map((doc) => {
 						const isExpanded = expanded.has(doc.id);
 						const isDeleting = deletingIds.has(doc.id);
@@ -221,7 +221,7 @@ function SortableHeader({
 
 	return (
 		<th
-			className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:text-gray-700 select-none"
+			className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:text-gray-700 dark:hover:text-gray-300 select-none"
 			onClick={() => onSort(sortKey)}
 		>
 			<span className="inline-flex items-center gap-1">
@@ -257,26 +257,26 @@ function DocumentRow({
 	return (
 		<>
 			<tr
-				className={`hover:bg-gray-50 cursor-pointer transition-colors ${isDeleting ? "opacity-50" : ""}`}
+				className={`hover:bg-gray-50 dark:hover:bg-gray-800/50 cursor-pointer transition-colors ${isDeleting ? "opacity-50" : ""}`}
 				onClick={onToggleExpand}
 			>
 				<td className="px-4 py-3">
 					<ChevronRight
-						className={`h-4 w-4 text-gray-400 transition-transform ${isExpanded ? "rotate-90" : ""}`}
+						className={`h-4 w-4 text-gray-400 dark:text-gray-500 transition-transform ${isExpanded ? "rotate-90" : ""}`}
 					/>
 				</td>
-				<td className="px-4 py-3 text-sm font-medium text-gray-900">
+				<td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-gray-100">
 					{doc.title}
 				</td>
-				<td className="px-4 py-3 text-sm text-gray-500">
+				<td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
 					{new Date(doc.createdAt).toLocaleDateString("en-US", {
 						year: "numeric",
 						month: "short",
 						day: "numeric",
 					})}
 				</td>
-				<td className="px-4 py-3 text-sm text-gray-500">
-					<span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600">
+				<td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
+					<span className="inline-flex items-center rounded-full bg-gray-100 dark:bg-gray-700 px-2.5 py-0.5 text-xs font-medium text-gray-600 dark:text-gray-400">
 						{doc.chunkCount}
 					</span>
 				</td>
@@ -285,7 +285,7 @@ function DocumentRow({
 						type="button"
 						onClick={onDelete}
 						disabled={isDeleting}
-						className="text-gray-400 hover:text-red-500 transition-colors disabled:opacity-50"
+						className="text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 transition-colors disabled:opacity-50"
 						title={`Delete ${doc.title}`}
 					>
 						<Trash2 className="h-4 w-4" />
@@ -294,7 +294,7 @@ function DocumentRow({
 			</tr>
 			{isExpanded && (
 				<tr>
-					<td colSpan={5} className="bg-gray-50/50 px-4">
+					<td colSpan={5} className="bg-gray-50/50 dark:bg-gray-800/30 px-4">
 						<ChunkPreview chunks={chunks} isLoading={isLoadingChunks} />
 					</td>
 				</tr>

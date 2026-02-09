@@ -57,7 +57,7 @@ export function ChatInput({
 				type="submit"
 				disabled={disabled || !value.trim()}
 				aria-label="Send message"
-				className="flex-shrink-0 rounded-full p-2.5 bg-blue-600 dark:bg-blue-500 text-white hover:bg-blue-700 dark:hover:bg-blue-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+				className="flex-shrink-0 rounded-full p-2.5 bg-blue-600 dark:bg-blue-500 text-white hover:bg-blue-700 dark:hover:bg-blue-400 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
 			>
 				<SendHorizonal size={20} />
 			</button>

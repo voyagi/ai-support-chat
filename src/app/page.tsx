@@ -31,7 +31,7 @@ export default function Home() {
 					{/* Primary CTA */}
 					<Link
 						href="/chat"
-						className="inline-flex items-center gap-2 px-8 py-4 bg-blue-600 dark:bg-blue-500 text-white text-lg font-semibold rounded-xl hover:bg-blue-700 dark:hover:bg-blue-400 transition-colors shadow-lg hover:shadow-xl mt-10"
+						className="inline-flex items-center gap-2 px-8 py-4 bg-blue-600 dark:bg-blue-500 text-white text-lg font-semibold rounded-xl hover:bg-blue-700 dark:hover:bg-blue-400 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-lg hover:shadow-xl mt-10"
 					>
 						<MessageCircle className="w-5 h-5" />
 						Try the Demo

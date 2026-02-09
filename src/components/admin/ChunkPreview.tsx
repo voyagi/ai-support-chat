@@ -14,7 +14,7 @@ export function ChunkPreview({ chunks, isLoading }: ChunkPreviewProps) {
 
 	if (isLoading) {
 		return (
-			<div className="flex items-center gap-2 py-4 px-3 text-sm text-gray-500">
+			<div className="flex items-center gap-2 py-4 px-3 text-sm text-gray-500 dark:text-gray-400">
 				<Loader2 className="h-4 w-4 animate-spin" />
 				Loading chunks...
 			</div>
@@ -23,7 +23,7 @@ export function ChunkPreview({ chunks, isLoading }: ChunkPreviewProps) {
 
 	if (chunks.length === 0) {
 		return (
-			<p className="py-4 px-3 text-sm text-gray-400">
+			<p className="py-4 px-3 text-sm text-gray-400 dark:text-gray-500">
 				No chunks found for this document.
 			</p>
 		);
@@ -55,25 +55,25 @@ export function ChunkPreview({ chunks, isLoading }: ChunkPreviewProps) {
 					<button
 						key={chunk.id}
 						type="button"
-						className="w-full text-left rounded-lg bg-gray-50 p-3 cursor-pointer hover:bg-gray-100 transition-colors"
+						className="w-full text-left rounded-lg bg-gray-50 dark:bg-gray-700/50 p-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
 						onClick={() => toggleChunk(chunk.id)}
 					>
 						<div className="flex items-center gap-2 mb-1.5">
-							<Hash className="h-3 w-3 text-gray-400" />
-							<span className="text-xs font-medium text-gray-500">
+							<Hash className="h-3 w-3 text-gray-400 dark:text-gray-500" />
+							<span className="text-xs font-medium text-gray-500 dark:text-gray-400">
 								Chunk {chunk.chunkPosition} of {chunk.totalChunks}
 							</span>
 							{chunk.sectionHeading && (
-								<span className="text-xs text-gray-400">
+								<span className="text-xs text-gray-400 dark:text-gray-500">
 									&middot; {chunk.sectionHeading}
 								</span>
 							)}
 						</div>
-						<p className="text-sm text-gray-700 whitespace-pre-wrap break-words">
+						<p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap break-words">
 							{displayContent}
 						</p>
 						{shouldTruncate && (
-							<span className="text-xs text-blue-500 mt-1 inline-block">
+							<span className="text-xs text-blue-500 dark:text-blue-400 mt-1 inline-block">
 								{isExpanded ? "Click to collapse" : "Click to expand"}
 							</span>
 						)}

@@ -58,7 +58,7 @@ export function ThemeToggle() {
 			<button
 				type="button"
 				onClick={() => setIsOpen(!isOpen)}
-				className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+				className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 dark:focus-visible:outline-blue-400"
 				aria-label="Toggle theme"
 			>
 				{getCurrentIcon()}

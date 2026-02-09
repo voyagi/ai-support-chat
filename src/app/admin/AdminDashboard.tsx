@@ -21,8 +21,10 @@ export function AdminDashboard({ initialDocuments }: AdminDashboardProps) {
 	return (
 		<div className="max-w-6xl mx-auto pt-8 px-6 pb-12">
 			<div className="mb-8 flex items-center gap-3">
-				<h1 className="text-2xl font-bold text-gray-900">Knowledge Base</h1>
-				<span className="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600">
+				<h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+					Knowledge Base
+				</h1>
+				<span className="inline-flex items-center rounded-full bg-gray-100 dark:bg-gray-800 px-3 py-1 text-xs font-medium text-gray-600 dark:text-gray-400">
 					{documents.length} {documents.length === 1 ? "document" : "documents"}
 				</span>
 			</div>

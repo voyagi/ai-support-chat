@@ -84,20 +84,20 @@ export function UploadZone({ onUploadComplete }: UploadZoneProps) {
 				{...getRootProps()}
 				className={`rounded-xl border-2 border-dashed p-8 text-center transition-colors cursor-pointer ${
 					isDragActive
-						? "border-blue-400 bg-blue-50"
-						: "border-gray-300 bg-white hover:border-gray-400"
+						? "border-blue-400 dark:border-blue-500 bg-blue-50 dark:bg-blue-900/20"
+						: "border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-gray-400 dark:hover:border-gray-500"
 				}`}
 			>
 				<input {...getInputProps()} />
 				<Upload
-					className={`h-8 w-8 mx-auto mb-3 ${isDragActive ? "text-blue-500" : "text-gray-400"}`}
+					className={`h-8 w-8 mx-auto mb-3 ${isDragActive ? "text-blue-500 dark:text-blue-400" : "text-gray-400 dark:text-gray-500"}`}
 				/>
-				<p className="text-sm text-gray-600">
+				<p className="text-sm text-gray-600 dark:text-gray-400">
 					{isDragActive
 						? "Drop files here..."
 						: "Drag & drop .txt or .md files here, or click to select"}
 				</p>
-				<p className="text-xs text-gray-400 mt-1">
+				<p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
 					Up to 10 files, max 5MB each
 				</p>
 			</div>
@@ -107,10 +107,10 @@ export function UploadZone({ onUploadComplete }: UploadZoneProps) {
 					{files.map((file) => (
 						<div
 							key={file.name}
-							className="flex items-center gap-3 rounded-lg border border-gray-200 bg-white px-4 py-2.5"
+							className="flex items-center gap-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2.5"
 						>
-							<FileText className="h-4 w-4 text-gray-400 shrink-0" />
-							<span className="text-sm text-gray-700 truncate flex-1">
+							<FileText className="h-4 w-4 text-gray-400 dark:text-gray-500 shrink-0" />
+							<span className="text-sm text-gray-700 dark:text-gray-300 truncate flex-1">
 								{file.name}
 							</span>
 							<StatusBadge status={file.status} error={file.error} />

@@ -50,13 +50,16 @@ export function LoginForm() {
 			<div>
 				<label
 					htmlFor={passwordId}
-					className="block text-sm font-medium text-gray-700 mb-1.5"
+					className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
 				>
 					Admin Password
 				</label>
 				<div className="relative">
 					<div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-						<Lock className="h-4 w-4 text-gray-400" aria-hidden="true" />
+						<Lock
+							className="h-4 w-4 text-gray-400 dark:text-gray-500"
+							aria-hidden="true"
+						/>
 					</div>
 					<input
 						ref={inputRef}
@@ -66,9 +69,10 @@ export function LoginForm() {
 						autoComplete="current-password"
 						disabled={isPending}
 						className={`
-							block w-full rounded-lg border border-gray-300 py-2.5 pl-10 pr-4
-							text-gray-900 placeholder-gray-400
-							focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none
+							block w-full rounded-lg border border-gray-300 dark:border-gray-600 py-2.5 pl-10 pr-4
+							text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500
+							dark:bg-gray-700
+							focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 focus:outline-none
 							disabled:opacity-50 disabled:cursor-not-allowed
 							transition-colors
 							${shake ? "animate-[shake_0.5s_ease-in-out]" : ""}
@@ -80,10 +84,10 @@ export function LoginForm() {
 
 			{error && (
 				<p
-					className="text-sm text-red-600 flex items-center gap-1.5"
+					className="text-sm text-red-600 dark:text-red-400 flex items-center gap-1.5"
 					role="alert"
 				>
-					<span className="inline-block h-1 w-1 rounded-full bg-red-600" />
+					<span className="inline-block h-1 w-1 rounded-full bg-red-600 dark:bg-red-400" />
 					{error}
 				</p>
 			)}
@@ -92,11 +96,11 @@ export function LoginForm() {
 				type="submit"
 				disabled={isPending}
 				className="
-					w-full rounded-lg bg-blue-600 px-4 py-2.5
+					w-full rounded-lg bg-blue-600 dark:bg-blue-500 px-4 py-2.5
 					text-sm font-semibold text-white
-					hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-2
+					hover:bg-blue-700 dark:hover:bg-blue-400 hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-blue-500/50 dark:focus:ring-blue-400/50 focus:ring-offset-2 dark:focus:ring-offset-gray-800
 					disabled:opacity-50 disabled:cursor-not-allowed
-					transition-colors flex items-center justify-center gap-2
+					transition-all duration-200 flex items-center justify-center gap-2
 				"
 			>
 				{isPending ? (

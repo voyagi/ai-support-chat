@@ -1,6 +1,7 @@
 "use client";
 
 import { Bot, ChevronDown, ChevronUp } from "lucide-react";
+import { motion } from "motion/react";
 import { useState } from "react";
 
 interface Source {
@@ -21,16 +22,26 @@ export function MessageBubble({ role, content, sources }: MessageBubbleProps) {
 
 	if (role === "user") {
 		return (
-			<div className="flex justify-end">
+			<motion.div
+				initial={{ opacity: 0, y: 12 }}
+				animate={{ opacity: 1, y: 0 }}
+				transition={{ duration: 0.3, ease: "easeOut" }}
+				className="flex justify-end"
+			>
 				<div className="bg-blue-600 dark:bg-blue-500 text-white rounded-lg rounded-br-sm px-4 py-2.5 max-w-[80%] md:max-w-[70%]">
 					<p className="whitespace-pre-wrap">{content}</p>
 				</div>
-			</div>
+			</motion.div>
 		);
 	}
 
 	return (
-		<div className="flex gap-3">
+		<motion.div
+			initial={{ opacity: 0, y: 12 }}
+			animate={{ opacity: 1, y: 0 }}
+			transition={{ duration: 0.3, ease: "easeOut" }}
+			className="flex gap-3"
+		>
 			{/* Bot avatar */}
 			<div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center">
 				<Bot size={20} />
@@ -87,6 +98,6 @@ export function MessageBubble({ role, content, sources }: MessageBubbleProps) {
 					</div>
 				)}
 			</div>
-		</div>
+		</motion.div>
 	);
 }
