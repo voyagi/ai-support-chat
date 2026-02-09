@@ -9,20 +9,20 @@ See: .planning/PROJECT.md (updated 2026-02-08)
 
 ## Current Position
 
-Phase: 6 of 10 (Embeddable Widget)
-Plan: 3 of 3 in current phase
+Phase: 7 of 10 (Embed Code Generator)
+Plan: 1 of 2 in current phase
 Status: Complete
-Last activity: 2026-02-09 - Completed 06-03-PLAN.md (Widget integration with HTTP headers)
+Last activity: 2026-02-09 - Completed 07-01-PLAN.md (Embed code generator page with live preview)
 
-Progress: [██████████████░░░░░░] 73% (16 of ~22 plans)
+Progress: [███████████████░░░░░] 77% (17 of ~22 plans)
 
 ## Performance Metrics
 
 ### Velocity
 
-- Total plans completed: 16
-- Average duration: 7.1 min
-- Total execution time: 2.10 hours
+- Total plans completed: 17
+- Average duration: 6.9 min
+- Total execution time: 2.18 hours
 
 ### By Phase
 
@@ -34,11 +34,12 @@ Progress: [██████████████░░░░░░] 73% (16
 | 04-full-page-chat-ui | 2/2 | 18min | 9.0min |
 | 05-dark-mode-polish | 2/2 | 17min | 8.5min |
 | 06-embeddable-widget | 3/3 | 12min | 4.0min |
+| 07-embed-code-generator | 1/2 | 5min | 5.0min |
 
 ### Recent Trend
 
-- Last 5 plans: 05-02 (12min), 06-01 (3min), 06-02 (4min), 06-03 (5min)
-- Trend: Phase 6 complete! Embeddable widget fully integrated and verified. Outstanding velocity (4.0min avg). Widget is production-ready.
+- Last 5 plans: 06-01 (3min), 06-02 (4min), 06-03 (5min), 07-01 (5min)
+- Trend: Phase 7 started! Embed code generator built with live preview. Maintaining excellent velocity (5min). UI polish work continues.
 
 *Updated after each plan completion*
 
@@ -107,6 +108,9 @@ Recent decisions affecting current work:
 - [Phase 06-02]: Inline styles only (no CSS classes) to prevent host page style conflicts — Object.assign pattern with ai-chat-widget-* prefixed IDs
 - [Phase 06-03]: Route-specific permissive headers (X-Frame-Options ALLOWALL, CSP frame-ancestors *, CORS *) only on /widget and /widget.js — Rest of app keeps restrictive security headers
 - [Phase 06-03]: Console Ninja dev tool interference with widget.js documented as local-only issue (production builds unaffected)
+- [Phase 07-01]: Hand-rolled HTML tokenizer for syntax highlighting — Keeps bundle small, dark background fixed (not theme-dependent)
+- [Phase 07-01]: useId for form element IDs — Ensures accessibility when component used multiple times
+- [Phase 07-01]: postMessage config updates to iframe widget — BrowserPreview sends config on load and state changes
 
 ### Pending Todos
 
@@ -118,6 +122,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-09T13:58:01Z
-Stopped at: Completed 06-03-PLAN.md (Widget integration with HTTP headers) - Phase 6 complete
+Last session: 2026-02-09T16:24:14Z
+Stopped at: Completed 07-01-PLAN.md (Embed code generator page with live preview) - Phase 7 in progress
 Resume file: None
