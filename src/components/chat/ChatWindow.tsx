@@ -26,25 +26,35 @@ function getMessageText(message: {
 }
 
 export function ChatWindow() {
-	const [conversationId, setConversationId] = useState<string | null>(null);
+	const conversationIdRef = useRef<string | null>(null);
 	const [sourcesMap, setSourcesMap] = useState<Record<string, Source[]>>({});
 	const bottomRef = useRef<HTMLDivElement>(null);
 	const [isAtBottom, setIsAtBottom] = useState(true);
 
-	// Create chat instance with DefaultChatTransport
+	// Create chat instance with DefaultChatTransport (stable — no state deps)
 	const chat = useMemo(
 		() =>
 			new Chat({
 				transport: new DefaultChatTransport({
 					api: "/api/chat",
-					body: { conversationId },
 					fetch: async (url, options) => {
+						// Inject conversationId into request body
+						if (options?.body && conversationIdRef.current) {
+							try {
+								const body = JSON.parse(options.body as string);
+								body.conversationId = conversationIdRef.current;
+								options = { ...options, body: JSON.stringify(body) };
+							} catch {
+								// If body isn't JSON, send as-is
+							}
+						}
+
 						const response = await fetch(url, options);
 
 						// Extract conversation ID from headers
 						const convId = response.headers.get("X-Conversation-Id");
-						if (convId && !conversationId) {
-							setConversationId(convId);
+						if (convId && !conversationIdRef.current) {
+							conversationIdRef.current = convId;
 						}
 
 						// Extract citation sources from headers
@@ -52,8 +62,6 @@ export function ChatWindow() {
 						if (sourcesHeader) {
 							try {
 								const sources = JSON.parse(sourcesHeader) as Source[];
-								// We'll associate sources with the assistant message once it appears
-								// Store temporarily and associate when the new assistant message ID is available
 								setSourcesMap((prev) => ({
 									...prev,
 									_pending: sources,
@@ -67,7 +75,7 @@ export function ChatWindow() {
 					},
 				}),
 			}),
-		[conversationId],
+		[],
 	);
 
 	const { messages, sendMessage, status, error, regenerate } = useChat({

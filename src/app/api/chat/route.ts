@@ -15,9 +15,34 @@ import { buildSystemPrompt } from "@/lib/chat/prompt";
 import { countTokens } from "@/lib/embeddings/token-counter";
 import { searchSimilarChunks } from "@/lib/rag/similarity-search";
 
+interface MessagePart {
+	type: string;
+	text?: string;
+}
+
+interface ChatMessage {
+	role: "user" | "assistant";
+	content?: string;
+	parts?: MessagePart[];
+}
+
 interface RequestBody {
-	messages: Array<{ role: "user" | "assistant"; content: string }>;
+	messages: ChatMessage[];
 	conversationId: string | null;
+}
+
+/** Extract text content from a message (handles both plain content and AI SDK v6 parts format) */
+function extractMessageText(message: ChatMessage): string {
+	if (message.content) {
+		return message.content;
+	}
+	if (message.parts) {
+		return message.parts
+			.filter((part) => part.type === "text" && part.text)
+			.map((part) => part.text)
+			.join("");
+	}
+	return "";
 }
 
 export async function POST(req: Request) {
@@ -42,6 +67,14 @@ export async function POST(req: Request) {
 			);
 		}
 
+		const userMessage = extractMessageText(lastMessage);
+		if (!userMessage) {
+			return Response.json(
+				{ error: "Last message must contain text content" },
+				{ status: 400 },
+			);
+		}
+
 		// 3. Check message cap
 		if (incomingConversationId) {
 			const messageCount = await getMessageCount(incomingConversationId);
@@ -61,7 +94,6 @@ export async function POST(req: Request) {
 			incomingConversationId || (await createConversation());
 
 		// 5. RAG retrieval
-		const userMessage = lastMessage.content;
 		const chunks = await searchSimilarChunks(userMessage, {
 			threshold: 0.7,
 			count: 5,
@@ -83,9 +115,16 @@ export async function POST(req: Request) {
 		const systemTokens = countTokens(systemPrompt);
 		const ragTokens = countTokens(ragContext);
 		const availableBudget = calculateAvailableBudget(systemTokens, ragTokens);
-		const selectedHistory = selectHistoryMessages(messages, availableBudget);
 
-		// Ensure messages have the correct type format for AI SDK
+		// Normalize messages to {role, content} before downstream processing
+		const normalizedMessages = messages.map((msg) => ({
+			role: msg.role,
+			content: extractMessageText(msg),
+		}));
+		const selectedHistory = selectHistoryMessages(
+			normalizedMessages,
+			availableBudget,
+		);
 		const coreMessages = selectedHistory.map((msg) => ({
 			role: msg.role as "user" | "assistant",
 			content: msg.content,
