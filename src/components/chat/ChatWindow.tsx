@@ -4,6 +4,7 @@ import { Chat, useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { Bot, RefreshCw } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { ThemeToggle } from "../ui/ThemeToggle";
 import { ChatInput } from "./ChatInput";
 import { MessageBubble } from "./MessageBubble";
 import { TypingIndicator } from "./TypingIndicator";
@@ -136,20 +137,25 @@ export function ChatWindow() {
 	return (
 		<div className="flex flex-col h-screen">
 			{/* Header */}
-			<header className="border-b bg-white py-3 px-4 md:py-4">
+			<header className="border-b dark:border-gray-700 bg-white dark:bg-gray-900 py-3 px-4 md:py-4">
 				<div className="max-w-3xl mx-auto">
-					<div className="flex items-center gap-3">
-						<div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
-							<Bot size={24} />
+					<div className="flex items-center justify-between gap-3">
+						<div className="flex items-center gap-3">
+							<div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+								<Bot size={24} />
+							</div>
+							<div>
+								<h1 className="text-lg md:text-xl font-semibold text-gray-900 dark:text-gray-100">
+									Flo
+								</h1>
+								<p className="text-xs md:text-sm text-gray-600 dark:text-gray-400">
+									FlowBoard AI Support
+								</p>
+							</div>
 						</div>
-						<div>
-							<h1 className="text-lg md:text-xl font-semibold">Flo</h1>
-							<p className="text-xs md:text-sm text-gray-600">
-								FlowBoard AI Support
-							</p>
-						</div>
+						<ThemeToggle />
 					</div>
-					<p className="text-xs text-gray-500 mt-2">
+					<p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
 						AI assistant — answers based on documentation
 					</p>
 				</div>
@@ -162,13 +168,13 @@ export function ChatWindow() {
 					{messages.length === 0 && (
 						<div className="flex items-center justify-center min-h-[400px]">
 							<div className="text-center max-w-md">
-								<div className="w-16 h-16 mx-auto mb-4 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
+								<div className="w-16 h-16 mx-auto mb-4 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center">
 									<Bot size={32} />
 								</div>
-								<h2 className="text-xl font-semibold mb-2">
+								<h2 className="text-xl font-semibold mb-2 text-gray-900 dark:text-gray-100">
 									Hi! I'm Flo, FlowBoard's AI assistant
 								</h2>
-								<p className="text-gray-600">
+								<p className="text-gray-600 dark:text-gray-400">
 									Ask me anything about FlowBoard — pricing, features,
 									integrations, and more!
 								</p>
@@ -195,14 +201,14 @@ export function ChatWindow() {
 
 					{/* Error state */}
 					{error && (
-						<div className="bg-red-50 border border-red-200 rounded-lg p-4">
-							<p className="text-red-800 text-sm mb-2">
+						<div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+							<p className="text-red-800 dark:text-red-200 text-sm mb-2">
 								Something went wrong. Please try again.
 							</p>
 							<button
 								type="button"
 								onClick={() => regenerate()}
-								className="flex items-center gap-2 text-red-600 text-sm font-medium hover:text-red-700"
+								className="flex items-center gap-2 text-red-600 dark:text-red-400 text-sm font-medium hover:text-red-700 dark:hover:text-red-300"
 							>
 								<RefreshCw size={16} />
 								Retry
@@ -212,13 +218,13 @@ export function ChatWindow() {
 
 					{/* Message limit warning */}
 					{showMessageLimitWarning && (
-						<div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-							<p className="text-amber-800 text-sm">
+						<div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
+							<p className="text-amber-800 dark:text-amber-200 text-sm">
 								Approaching conversation limit.{" "}
 								<button
 									type="button"
 									onClick={() => window.location.reload()}
-									className="text-amber-900 underline font-medium"
+									className="text-amber-900 dark:text-amber-100 underline font-medium"
 								>
 									Start new chat
 								</button>
@@ -232,7 +238,7 @@ export function ChatWindow() {
 			</div>
 
 			{/* Input Area */}
-			<div className="border-t bg-white p-4">
+			<div className="border-t dark:border-gray-700 bg-white dark:bg-gray-900 p-4">
 				<div className="max-w-3xl mx-auto">
 					<ChatInput
 						onSubmit={handleSendMessage}

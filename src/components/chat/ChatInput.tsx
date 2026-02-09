@@ -51,13 +51,13 @@ export function ChatInput({
 				placeholder={placeholder}
 				aria-label="Chat message input"
 				rows={1}
-				className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg resize-none max-h-[6rem] overflow-y-auto focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+				className="flex-1 px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg resize-none max-h-[6rem] overflow-y-auto focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500"
 			/>
 			<button
 				type="submit"
 				disabled={disabled || !value.trim()}
 				aria-label="Send message"
-				className="flex-shrink-0 rounded-full p-2.5 bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+				className="flex-shrink-0 rounded-full p-2.5 bg-blue-600 dark:bg-blue-500 text-white hover:bg-blue-700 dark:hover:bg-blue-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
 			>
 				<SendHorizonal size={20} />
 			</button>
