@@ -22,10 +22,16 @@ export default function WidgetPage() {
 		const handleMessage = (event: MessageEvent) => {
 			if (!isAllowedOrigin(event.origin)) return;
 
-			const { type, theme } = event.data ?? {};
+			const { type, theme, config } = event.data ?? {};
 
 			if (type === "THEME_UPDATE" && (theme === "light" || theme === "dark")) {
 				setTheme(theme);
+			}
+
+			if (type === "CONFIG_UPDATE") {
+				if (config?.theme === "light" || config?.theme === "dark") {
+					setTheme(config.theme);
+				}
 			}
 		};
 
