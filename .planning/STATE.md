@@ -10,19 +10,19 @@ See: .planning/PROJECT.md (updated 2026-02-08)
 ## Current Position
 
 Phase: 3 of 10 (Chat API & Streaming)
-Plan: 1 of 2 in current phase
-Status: In progress
-Last activity: 2026-02-09 - Completed 03-01-PLAN.md (Chat infrastructure modules)
+Plan: 2 of 2 in current phase
+Status: Phase complete
+Last activity: 2026-02-09 - Completed 03-02-PLAN.md (Streaming chat API endpoint)
 
-Progress: [█████████░░░░░░░░░░░] 41% (9 of ~22 plans)
+Progress: [█████████░░░░░░░░░░░] 45% (10 of ~22 plans)
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 9
-- Average duration: 8.4 min
-- Total execution time: 1.28 hours
+- Total plans completed: 10
+- Average duration: 8.1 min
+- Total execution time: 1.42 hours
 
 **By Phase:**
 
@@ -30,12 +30,12 @@ Progress: [█████████░░░░░░░░░░░] 41% (9 
 |-------|-------|-------|----------|
 | 01-database-rag-foundation | 4/4 | 37min | 9.3min |
 | 02-admin-panel-content-upload | 4/4 | 57min | 14.3min |
-| 03-chat-api-streaming | 1/2 | 4min | 4.0min |
+| 03-chat-api-streaming | 2/2 | 11min | 5.5min |
 
 **Recent Trend:**
 
-- Last 5 plans: 02-02 (7min), 02-03 (8min), 02-04 (~35min incl. human verification), 03-01 (4min)
-- Trend: Auto plans ~7.5min, Phase 3 infrastructure setup faster
+- Last 5 plans: 02-03 (8min), 02-04 (~35min incl. human verification), 03-01 (4min), 03-02 (7min)
+- Trend: Phase 3 very efficient (avg 5.5min), shorter than overall avg (8.1min)
 
 *Updated after each plan completion*
 
@@ -72,6 +72,12 @@ Recent decisions affecting current work:
 - 120K token input budget (8K reserve from 128K context) - Ensures room for output + safety (03-01)
 - Last 10 messages for conversation history - 5 user + 5 assistant pairs max (03-01)
 - Atomic message persistence (user + assistant in single insert) - Cleaner transactions (03-01)
+- gpt-4.1-mini model for chat (gpt-4o-mini retiring Feb 13) - Future-proof model choice (03-02)
+- toUIMessageStreamResponse for streaming - AI SDK v6 standard response method (03-02)
+- Citation sources limited to top 2 chunks - Balance between usefulness and response size (03-02)
+- Conversation creation before streaming - Prevents race conditions in fire-and-forget persistence (03-02)
+- Fire-and-forget persistence pattern - onFinish callback doesn't block stream, logs errors only (03-02)
+- Custom headers for metadata (X-Conversation-Id, X-Sources) - Simple metadata transport without data stream complexity (03-02)
 
 ### Pending Todos
 
@@ -83,6 +89,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-09T06:35:34Z
-Stopped at: Completed 03-01-PLAN.md (Chat infrastructure modules)
+Last session: 2026-02-09T06:46:24Z
+Stopped at: Completed 03-02-PLAN.md (Streaming chat API endpoint) - Phase 3 complete
 Resume file: None
