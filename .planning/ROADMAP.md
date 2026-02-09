@@ -123,12 +123,12 @@ Plans:
   4. Message appearances have smooth animations (fade in, slide up)
   5. Interactive elements have hover states, focus rings, and micro-interactions
 
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
 
-- [ ] 05-01: TBD
-- [ ] 05-02: TBD
+- [ ] 05-01-PLAN.md -- Dark mode infrastructure (next-themes, Tailwind v4 custom variant, ThemeToggle) + chat and landing page dark mode
+- [ ] 05-02-PLAN.md -- Admin pages dark mode + message animations (Motion) + micro-interactions + human verification
 
 ### Phase 6: Embeddable Widget
 
