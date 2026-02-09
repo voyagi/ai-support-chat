@@ -143,12 +143,13 @@ Plans:
   4. Widget loads asynchronously without blocking host page rendering
   5. Widget communicates with parent page via secure postMessage API
 
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
 
-- [ ] 06-01: TBD
-- [ ] 06-02: TBD
+- [ ] 06-01-PLAN.md -- Widget iframe page + ChatWindow widget mode + postMessage (iframe-side)
+- [ ] 06-02-PLAN.md -- Widget loader IIFE script + Rollup build configuration
+- [ ] 06-03-PLAN.md -- Integration wiring (HTTP headers, test page) + human verification
 
 ### Phase 7: Embed Code Generator
 
