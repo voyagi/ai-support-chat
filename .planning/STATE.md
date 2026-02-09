@@ -5,7 +5,7 @@
 See: .planning/PROJECT.md (updated 2026-02-08)
 
 **Core value:** A prospect interacts with the demo and thinks "I want this, but for my business"
-**Current focus:** Phase 3 in progress (Chat API & Streaming)
+**Current focus:** Phase 3 complete -- ready for Phase 4 (Full-Page Chat UI)
 
 ## Current Position
 
