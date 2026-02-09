@@ -103,12 +103,12 @@ Plans:
   4. UI is responsive across desktop, tablet, and mobile breakpoints
   5. Landing page provides zero-friction demo entry (instant chat access, no signup)
 
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
 
-- [ ] 04-01: TBD
-- [ ] 04-02: TBD
+- [ ] 04-01-PLAN.md -- Chat UI components (MessageBubble, ChatInput, TypingIndicator, MessageSkeleton, ChatWindow) + /chat page with useChat integration
+- [ ] 04-02-PLAN.md -- Landing page with zero-friction demo CTA + full-flow human verification
 
 ### Phase 5: Dark Mode & Polish
 
