@@ -9,22 +9,22 @@ See: .planning/PROJECT.md (updated 2026-02-08)
 
 ## Current Position
 
-Phase: 5 of 10 (Dark Mode & Polish)
-Plan: 2 of 2 in current phase
-Status: Phase complete
-Last activity: 2026-02-09 - Completed 05-02-PLAN.md (Admin dark mode + animations + verification)
+Phase: 6 of 10 (Embeddable Widget)
+Plan: 1 of 3 in current phase
+Status: In progress
+Last activity: 2026-02-09 - Completed 06-01-PLAN.md (Widget iframe page with postMessage)
 
-Progress: [████████████░░░░░░░░] 64% (14 of ~22 plans)
+Progress: [█████████████░░░░░░░] 68% (15 of ~22 plans)
 
 ## Performance Metrics
 
-**Velocity:**
+### Velocity
 
-- Total plans completed: 14
-- Average duration: 7.6 min
-- Total execution time: 1.97 hours
+- Total plans completed: 15
+- Average duration: 7.3 min
+- Total execution time: 2.02 hours
 
-**By Phase:**
+### By Phase
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
@@ -33,11 +33,12 @@ Progress: [████████████░░░░░░░░] 64% (14
 | 03-chat-api-streaming | 2/2 | 11min | 5.5min |
 | 04-full-page-chat-ui | 2/2 | 18min | 9.0min |
 | 05-dark-mode-polish | 2/2 | 17min | 8.5min |
+| 06-embeddable-widget | 1/3 | 3min | 3.0min |
 
-**Recent Trend:**
+### Recent Trend
 
-- Last 5 plans: 04-01 (16min), 04-02 (25min incl. browser verification), 05-01 (5min), 05-02 (12min incl. human verification)
-- Trend: Phase 5 complete. Dark mode + animations shipped across all pages. Human verification caught 4 minor contrast/FOUC issues, all fixed.
+- Last 5 plans: 04-02 (25min), 05-01 (5min), 05-02 (12min), 06-01 (3min)
+- Trend: Phase 6 started. Widget iframe page shipped with postMessage protocol. Fast execution due to well-scoped plan.
 
 *Updated after each plan completion*
 
@@ -98,6 +99,10 @@ Recent decisions affecting current work:
 - Motion fade-in y:12 300ms easeOut for message bubbles - Subtle premium feel (05-02)
 - Scale micro-interactions only on primary CTAs (1.02x/0.98x) - Polish without being gimmicky (05-02)
 - Global prefers-reduced-motion override with !important - Ensures no animation leaks for accessibility (05-02)
+- Widget mode prop for ChatWindow (hides header, h-full container) - Dual-context component pattern (06-01)
+- postMessage protocol with origin validation - iframe→parent uses '*', parent→iframe validates origin (06-01)
+- ResizeObserver on document.body for iframe height tracking - Enables dynamic iframe sizing (06-01)
+- Widget layout does NOT duplicate ThemeProvider - Root layout already wraps /widget route (06-01)
 
 ### Pending Todos
 
@@ -109,6 +114,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-09T11:30:00Z
-Stopped at: Phase 5 complete — all plans executed, human verification passed
+Last session: 2026-02-09T12:50:47Z
+Stopped at: Completed 06-01-PLAN.md (Widget iframe page with postMessage)
 Resume file: None
