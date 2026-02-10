@@ -11,6 +11,7 @@
 		"lint": "biome lint --write .",
 		"format": "biome format --write .",
 		"seed": "npx tsx --env-file=.env.local scripts/seed.ts",
+		"seed:analytics": "npx tsx --env-file=.env.local scripts/seed-analytics.ts",
 		"evaluate": "npx tsx --env-file=.env.local scripts/evaluate.ts"
 	},
 	"dependencies": {
@@ -20,6 +21,7 @@
 		"@supabase/supabase-js": "^2.49.4",
 		"ai": "^6.0.77",
 		"clsx": "^2.1.1",
+		"date-fns": "^4.1.0",
 		"gpt-tokenizer": "^3.4.0",
 		"iron-session": "^8.0.4",
 		"lucide-react": "^0.511.0",
@@ -30,6 +32,7 @@
 		"react": "^19.1.0",
 		"react-dom": "^19.1.0",
 		"react-dropzone": "^14.4.0",
+		"recharts": "^3.7.0",
 		"tailwind-merge": "^3.3.0"
 	},
 	"devDependencies": {
