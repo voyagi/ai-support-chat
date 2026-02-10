@@ -36,12 +36,14 @@ export async function createConversation(): Promise<string> {
  * @param conversationId - UUID of the conversation
  * @param userContent - User's message content
  * @param assistantContent - Assistant's response content
+ * @param answeredFromKb - Whether the response was grounded in KB (default: true)
  * @throws Error with descriptive message if save fails
  */
 export async function saveMessages(
 	conversationId: string,
 	userContent: string,
 	assistantContent: string,
+	answeredFromKb = true,
 ): Promise<void> {
 	const supabase = createServiceRoleClient();
 
@@ -55,6 +57,7 @@ export async function saveMessages(
 			conversation_id: conversationId,
 			role: "assistant",
 			content: assistantContent,
+			answered_from_kb: answeredFromKb,
 		},
 	]);
 

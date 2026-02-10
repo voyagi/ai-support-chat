@@ -88,3 +88,57 @@ as $$
   order by dc.embedding <#> query_embedding
   limit match_count;
 $$;
+
+-- Add answered_from_kb column to messages for accuracy tracking
+alter table messages
+  add column if not exists answered_from_kb boolean default true;
+
+create index if not exists messages_answered_from_kb_idx
+  on messages(answered_from_kb);
+
+-- RPC function for chat volume time-series aggregation
+-- Supports daily and weekly aggregation with zero-filled gaps
+create or replace function get_chat_volume(
+  trunc_unit text,
+  interval_str text,
+  days_back int
+)
+returns table (
+  date timestamptz,
+  conversations bigint,
+  messages bigint
+)
+language sql stable
+as $$
+  with date_series as (
+    select generate_series(
+      date_trunc(trunc_unit, now() - make_interval(days => days_back)),
+      date_trunc(trunc_unit, now()),
+      interval_str::interval
+    ) as date
+  ),
+  conv_counts as (
+    select
+      date_trunc(trunc_unit, created_at) as date,
+      count(*) as conversations
+    from conversations
+    where created_at >= now() - make_interval(days => days_back)
+    group by date_trunc(trunc_unit, created_at)
+  ),
+  msg_counts as (
+    select
+      date_trunc(trunc_unit, m.created_at) as date,
+      count(*) as messages
+    from messages m
+    where m.created_at >= now() - make_interval(days => days_back)
+    group by date_trunc(trunc_unit, m.created_at)
+  )
+  select
+    ds.date,
+    coalesce(cc.conversations, 0) as conversations,
+    coalesce(mc.messages, 0) as messages
+  from date_series ds
+  left join conv_counts cc on ds.date = cc.date
+  left join msg_counts mc on ds.date = mc.date
+  order by ds.date;
+$$;

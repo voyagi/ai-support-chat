@@ -144,9 +144,14 @@ export async function POST(req: Request) {
 			temperature: 0.7,
 			// 8. Fire-and-forget persistence
 			onFinish: async ({ text }) => {
-				saveMessages(conversationId, userMessage, text).catch((err) => {
-					console.error("Failed to persist conversation:", err);
-				});
+				// Determine if answer was grounded in KB (chunks found with sufficient similarity)
+				const answeredFromKb = chunks.length > 0 && chunks[0].similarity > 0.7;
+
+				saveMessages(conversationId, userMessage, text, answeredFromKb).catch(
+					(err) => {
+						console.error("Failed to persist conversation:", err);
+					},
+				);
 			},
 		});
 
