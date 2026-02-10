@@ -204,11 +204,12 @@ Plans:
   4. Form submissions are saved to database and visible in admin panel
   5. Bot explicitly states "I don't have information on that" before showing form
 
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
 
-- [ ] 09-01: TBD
+- [ ] 09-01-PLAN.md -- Backend: DB migration (contact_submissions table), contact submission API, chat route low-confidence detection with data part
+- [ ] 09-02-PLAN.md -- Frontend: ContactForm component, MessageBubble/ChatWindow integration, admin contacts page, human verification
 
 ### Phase 10: Production Hardening
 
