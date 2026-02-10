@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-08)
 
 **Core value:** A prospect interacts with the demo and thinks "I want this, but for my business"
-**Current focus:** Phase 7 complete -- ready for Phase 8 (Analytics Dashboard)
+**Current focus:** Phase 8 in progress — Analytics Dashboard
 
 ## Current Position
 
-Phase: 7 of 10 (Embed Code Generator)
-Plan: 2 of 2 in current phase
-Status: Complete
-Last activity: 2026-02-09 - Completed 07-02-PLAN.md (CONFIG_UPDATE handler + human verification)
+Phase: 8 of 10 (Analytics Dashboard)
+Plan: 1 of 2 in current phase
+Status: In Progress
+Last activity: 2026-02-10 - Completed 08-01-PLAN.md (analytics backend + seed data)
 
-Progress: [████████████████░░░░] 82% (18 of ~22 plans)
+Progress: [████████████████░░░░] 86% (19 of ~22 plans)
 
 ## Performance Metrics
 
@@ -112,6 +112,10 @@ Recent decisions affecting current work:
 - [Phase 07-01]: useId for form element IDs — Ensures accessibility when component used multiple times
 - [Phase 07-01]: postMessage config updates to iframe widget — BrowserPreview sends config on load and state changes
 - [Phase 07-embed-code-generator]: CONFIG_UPDATE handler updates theme only (position/greeting are loader concerns, not iframe concerns)
+- [Phase 08-01]: Recharts instead of Tremor — Tremor incompatible with Tailwind CSS v4
+- [Phase 08-01]: answered_from_kb boolean on messages tracks RAG accuracy (defaults true for existing data)
+- [Phase 08-01]: Count queries for accuracy metrics — efficient, no row content transfer
+- [Phase 08-01]: 111 conversations, 648 messages seeded over 30 days for chart testing
 
 ### Pending Todos
 
