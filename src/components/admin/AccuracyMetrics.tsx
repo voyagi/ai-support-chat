@@ -5,8 +5,8 @@ import { Cell, Legend, Pie, PieChart, ResponsiveContainer } from "recharts";
 
 interface AccuracyData {
 	answeredFromKb: number;
-	total: number;
-	percentage: number;
+	totalMessages: number;
+	kbPercentage: number;
 }
 
 export function AccuracyMetrics() {
@@ -47,7 +47,7 @@ export function AccuracyMetrics() {
 		);
 	}
 
-	if (!data || data.total === 0) {
+	if (!data || data.totalMessages === 0) {
 		return (
 			<div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
 				<h3 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-4">
@@ -68,7 +68,7 @@ export function AccuracyMetrics() {
 		},
 		{
 			name: "Fallback",
-			value: data.total - data.answeredFromKb,
+			value: data.totalMessages - data.answeredFromKb,
 			color: "#f59e0b",
 		},
 	];
@@ -105,7 +105,7 @@ export function AccuracyMetrics() {
 				</ResponsiveContainer>
 				<div className="mt-2 text-center">
 					<div className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-						{data.percentage.toFixed(1)}%
+						{data.kbPercentage.toFixed(1)}%
 					</div>
 					<div className="text-xs text-gray-500 dark:text-gray-400">
 						Answered from KB
