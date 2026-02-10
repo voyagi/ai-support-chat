@@ -1,5 +1,5 @@
 import { createOpenAI } from "@ai-sdk/openai";
-import { streamText } from "ai";
+import { createUIMessageStream, streamText } from "ai";
 import {
 	calculateAvailableBudget,
 	formatRagContext,
@@ -99,6 +99,53 @@ export async function POST(req: Request) {
 			count: 5,
 		});
 
+		// Check if we have a confident answer from the knowledge base
+		const hasConfidentAnswer = chunks.length > 0 && chunks[0].similarity > 0.7;
+
+		// Low-confidence branch: return contact-form data part instead of calling LLM
+		if (!hasConfidentAnswer) {
+			const noAnswerText =
+				"I don't have information about that in my knowledge base. Let me connect you with our team who can help!";
+
+			// Create UI message stream with text + contact-form data part
+			const stream = createUIMessageStream({
+				execute: async ({ writer }) => {
+					// Write the text content
+					await writer.write({
+						type: "text-delta",
+						delta: noAnswerText,
+						id: "no-answer",
+					});
+
+					// Write the contact-form data part
+					await writer.write({
+						type: "data-contact-form",
+						data: {
+							conversationId,
+							originalQuestion: userMessage,
+						},
+					});
+				},
+			});
+
+			// Persist messages with answeredFromKb: false
+			saveMessages(conversationId, userMessage, noAnswerText, false).catch(
+				(err) => {
+					console.error("Failed to persist conversation:", err);
+				},
+			);
+
+			// Return stream with conversation ID header (no sources for low-confidence)
+			return new Response(stream, {
+				status: 200,
+				headers: {
+					"Content-Type": "text/plain; charset=utf-8",
+					"X-Conversation-Id": conversationId,
+				},
+			});
+		}
+
+		// High-confidence branch: proceed with LLM streaming
 		// Select top 1-2 chunks for citation sources
 		const citationSources = chunks.slice(0, 2).map((chunk) => ({
 			title: chunk.documentTitle,
