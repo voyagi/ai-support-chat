@@ -5,24 +5,24 @@
 See: .planning/PROJECT.md (updated 2026-02-08)
 
 **Core value:** A prospect interacts with the demo and thinks "I want this, but for my business"
-**Current focus:** Phase 8 in progress — Analytics Dashboard
+**Current focus:** Phase 9 in progress — Out-of-KB Handling
 
 ## Current Position
 
-Phase: 8 of 10 (Analytics Dashboard)
-Plan: 2 of 2 in current phase
+Phase: 9 of 10 (Out-of-KB Handling)
+Plan: 1 of 2 in current phase
 Status: Complete
-Last activity: 2026-02-10 - Completed 08-02-PLAN.md (analytics dashboard UI + human verification)
+Last activity: 2026-02-10 - Completed 09-01-PLAN.md (backend infrastructure for low-confidence detection)
 
-Progress: [██████████████████░░] 91% (20 of ~22 plans)
+Progress: [████████████████████░] 95% (21 of ~22 plans)
 
 ## Performance Metrics
 
 ### Velocity
 
-- Total plans completed: 18
-- Average duration: 6.7 min
-- Total execution time: 2.23 hours
+- Total plans completed: 19
+- Average duration: 6.6 min
+- Total execution time: 2.32 hours
 
 ### By Phase
 
@@ -36,11 +36,12 @@ Progress: [██████████████████░░] 91% (20
 | 06-embeddable-widget | 3/3 | 12min | 4.0min |
 | 07-embed-code-generator | 2/2 | 8min | 4.0min |
 | 08-analytics-dashboard | 2/2 | TBD | TBD |
+| 09-out-of-kb-handling | 1/2 | 5min | 5.0min |
 
 ### Recent Trend
 
-- Last 5 plans: 07-01 (5min), 07-02 (3min), 08-01, 08-02
-- Trend: Phase 8 complete! Analytics dashboard verified (12/12 human checks passed, 1 bug fix applied).
+- Last 5 plans: 07-02 (3min), 08-01, 08-02, 09-01 (5min)
+- Trend: Phase 9 started - backend infrastructure for out-of-KB handling complete.
 
 *Updated after each plan completion*
 
@@ -120,6 +121,9 @@ Recent decisions affecting current work:
 - [Phase 08-02]: Recharts AreaChart for volume, PieChart donut for accuracy — SVG-based, dark mode compatible
 - [Phase 08-02]: Supabase Realtime graceful degradation — counters work without Realtime enabled, refresh fallback
 - [Phase 08-02]: AccuracyMetrics interface must match API response shape exactly (bug fix: total→totalMessages, percentage→kbPercentage)
+- [Phase 09-01]: createUIMessageStream with text-delta + data-contact-form parts for low-confidence responses (AI SDK v6 pattern)
+- [Phase 09-01]: Confidence threshold 0.7 (consistent with existing RAG threshold and answered_from_kb logic)
+- [Phase 09-01]: contact_submissions table with status workflow (pending/contacted/resolved) for admin tracking
 
 ### Pending Todos
 
@@ -131,6 +135,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-09T16:40:00Z
-Stopped at: Completed 07-02-PLAN.md (CONFIG_UPDATE handler + human verification) - Phase 7 complete
+Last session: 2026-02-10T10:38:31Z
+Stopped at: Completed 09-01-PLAN.md (backend infrastructure for out-of-KB handling)
 Resume file: None
