@@ -3,6 +3,7 @@
 import { Bot, ChevronDown, ChevronUp } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
+import { ContactForm } from "./ContactForm";
 
 interface Source {
 	title: string;
@@ -15,9 +16,15 @@ interface MessageBubbleProps {
 	role: "user" | "assistant";
 	content: string;
 	sources?: Source[];
+	parts?: Array<{ type: string; [key: string]: unknown }>;
 }
 
-export function MessageBubble({ role, content, sources }: MessageBubbleProps) {
+export function MessageBubble({
+	role,
+	content,
+	sources,
+	parts,
+}: MessageBubbleProps) {
 	const [sourcesExpanded, setSourcesExpanded] = useState(false);
 
 	if (role === "user") {
@@ -53,6 +60,34 @@ export function MessageBubble({ role, content, sources }: MessageBubbleProps) {
 				<div className="bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg rounded-bl-sm px-4 py-2.5">
 					<p className="whitespace-pre-wrap">{content}</p>
 				</div>
+
+				{/* Contact Form - rendered when message contains contact-form data part */}
+				{parts &&
+					(() => {
+						// Find data part with contact-form type
+						const dataPart = parts.find((part) => part.type === "data");
+						if (dataPart && Array.isArray(dataPart.data)) {
+							const contactFormData = dataPart.data.find(
+								(item: { type?: string }) => item.type === "contact-form",
+							);
+							if (contactFormData && typeof contactFormData === "object") {
+								const { conversationId, originalQuestion } =
+									contactFormData as {
+										conversationId: string;
+										originalQuestion: string;
+									};
+								if (conversationId && originalQuestion) {
+									return (
+										<ContactForm
+											conversationId={conversationId}
+											originalQuestion={originalQuestion}
+										/>
+									);
+								}
+							}
+						}
+						return null;
+					})()}
 
 				{/* Sources section */}
 				{sources && sources.length > 0 && (

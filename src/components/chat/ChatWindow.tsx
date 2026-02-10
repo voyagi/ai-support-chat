@@ -200,6 +200,7 @@ export function ChatWindow({ widget = false }: ChatWindowProps) {
 								sources={
 									msg.role === "assistant" ? sourcesMap[msg.id] : undefined
 								}
+								parts={msg.parts}
 							/>
 						))}
 
