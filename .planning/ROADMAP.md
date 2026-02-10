@@ -20,7 +20,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 5: Dark Mode & Polish** - Theme system, animations, transitions, micro-interactions
 - [ ] **Phase 6: Embeddable Widget** - Widget page, loader script, iframe isolation
 - [x] **Phase 7: Embed Code Generator** - Admin copy-paste snippet, syntax highlighting, preview
-- [ ] **Phase 8: Analytics Dashboard** - Chat volume, common questions, accuracy tracking
+- [x] **Phase 8: Analytics Dashboard** - Chat volume, common questions, accuracy tracking
 - [ ] **Phase 9: Out-of-KB Handling** - Contact form fallback, confidence thresholds, hallucination prevention
 - [ ] **Phase 10: Production Hardening** - Rate limiting, cost controls, deployment to Vercel
 
@@ -188,8 +188,8 @@ Plans:
 
 Plans:
 
-- [ ] 08-01-PLAN.md -- Backend foundation: schema changes (answered_from_kb column, get_chat_volume RPC), accuracy tracking in chat API, analytics query lib, API routes, Recharts + date-fns install, seed data script
-- [ ] 08-02-PLAN.md -- Dashboard UI: ChatVolumeChart, AccuracyMetrics, RealtimeMetrics, RecentQuestions components, analytics page, admin nav link, human verification
+- [x] 08-01-PLAN.md -- Backend foundation: schema changes (answered_from_kb column, get_chat_volume RPC), accuracy tracking in chat API, analytics query lib, API routes, Recharts + date-fns install, seed data script
+- [x] 08-02-PLAN.md -- Dashboard UI: ChatVolumeChart, AccuracyMetrics, RealtimeMetrics, RecentQuestions components, analytics page, admin nav link, human verification
 
 ### Phase 9: Out-of-KB Handling
 
@@ -245,6 +245,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 5. Dark Mode & Polish | 2/2 | Complete | 2026-02-09 |
 | 6. Embeddable Widget | 3/3 | Complete | 2026-02-09 |
 | 7. Embed Code Generator | 2/2 | Complete | 2026-02-09 |
-| 8. Analytics Dashboard | 0/0 | Not started | - |
+| 8. Analytics Dashboard | 2/2 | Complete | 2026-02-10 |
 | 9. Out-of-KB Handling | 0/0 | Not started | - |
 | 10. Production Hardening | 0/0 | Not started | - |
