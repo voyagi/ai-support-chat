@@ -170,6 +170,26 @@ the demo feel realistic without needing a real client.
 Deploy to Vercel. The live URL will be linked from the Upwork profile.
 Widget embed should work on any external site via iframe.
 
+## Browser Testing
+
+For any task that requires visual verification, clicking, typing, form
+testing, or seeing a rendered page: use the dev-browser skill in
+`.claude/skills/dev-browser/`. Read its `SKILL.md` for the API.
+
+- ALWAYS use extension mode (`npm run start-extension`) — connects to the
+  user's Chrome, no separate window
+- NEVER install Playwright MCP or write raw Playwright scripts
+- Use `cdpScreenshot()` for screenshots (never `page.screenshot()`)
+- Use `getIframeContent()` / `evaluateInIframe()` for cross-origin iframes
+- If the skill isn't deployed yet, copy from
+  `/c/Users/Eagi/.claude/skill-library/dev-browser/`
+- **Never use `~` in bash paths** — MSYS expands to `/home/Eagi` not
+  `/c/Users/Eagi`
+
+## Test Credentials
+
+<!-- Auto-maintained by GSD — updated when auth tasks execute -->
+
 ## Commands
 
 ```bash
