@@ -223,14 +223,15 @@ Plans:
   3. Rate limiting restricts users to 20 requests/hour, 100 requests/day
   4. Responses are capped at 300 tokens to control OpenAI costs
   5. Admin can toggle "try it yourself" mode for prospect document uploads
-  6. Cost monitoring alerts trigger at $100/day OpenAI usage
+  6. Cost monitoring alerts trigger at $10/day OpenAI usage
 
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
 
-- [ ] 10-01: TBD
-- [ ] 10-02: TBD
+- [ ] 10-01-PLAN.md -- Rate limiting (Upstash Redis middleware) + cost tracking (token counting, $10/day budget cap) + chat UI warnings/disabled states
+- [ ] 10-02-PLAN.md -- "Try it yourself" sandbox mode (tenant isolation, upload limits, cron cleanup, chat page upload UI)
+- [ ] 10-03-PLAN.md -- FlowBoard branding (OG image, favicon, metadata, footer credit) + Vercel deployment + human verification
 
 ## Progress
 
