@@ -12,18 +12,23 @@ interface Source {
 	similarity: number;
 }
 
+interface ContactFormData {
+	conversationId: string;
+	originalQuestion: string;
+}
+
 interface MessageBubbleProps {
 	role: "user" | "assistant";
 	content: string;
 	sources?: Source[];
-	parts?: Array<{ type: string; [key: string]: unknown }>;
+	contactForm?: ContactFormData;
 }
 
 export function MessageBubble({
 	role,
 	content,
 	sources,
-	parts,
+	contactForm,
 }: MessageBubbleProps) {
 	const [sourcesExpanded, setSourcesExpanded] = useState(false);
 
@@ -61,33 +66,13 @@ export function MessageBubble({
 					<p className="whitespace-pre-wrap">{content}</p>
 				</div>
 
-				{/* Contact Form - rendered when message contains contact-form data part */}
-				{parts &&
-					(() => {
-						// Find data part with contact-form type
-						const dataPart = parts.find((part) => part.type === "data");
-						if (dataPart && Array.isArray(dataPart.data)) {
-							const contactFormData = dataPart.data.find(
-								(item: { type?: string }) => item.type === "contact-form",
-							);
-							if (contactFormData && typeof contactFormData === "object") {
-								const { conversationId, originalQuestion } =
-									contactFormData as {
-										conversationId: string;
-										originalQuestion: string;
-									};
-								if (conversationId && originalQuestion) {
-									return (
-										<ContactForm
-											conversationId={conversationId}
-											originalQuestion={originalQuestion}
-										/>
-									);
-								}
-							}
-						}
-						return null;
-					})()}
+				{/* Contact Form - rendered when low-confidence response triggers contact form */}
+				{contactForm && (
+					<ContactForm
+						conversationId={contactForm.conversationId}
+						originalQuestion={contactForm.originalQuestion}
+					/>
+				)}
 
 				{/* Sources section */}
 				{sources && sources.length > 0 && (

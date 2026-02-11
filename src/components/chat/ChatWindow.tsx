@@ -17,6 +17,11 @@ interface Source {
 	similarity: number;
 }
 
+interface ContactFormData {
+	conversationId: string;
+	originalQuestion: string;
+}
+
 interface ChatWindowProps {
 	widget?: boolean;
 }
@@ -33,7 +38,11 @@ function getMessageText(message: {
 
 export function ChatWindow({ widget = false }: ChatWindowProps) {
 	const conversationIdRef = useRef<string | null>(null);
+	const pendingContactRef = useRef<ContactFormData | null>(null);
 	const [sourcesMap, setSourcesMap] = useState<Record<string, Source[]>>({});
+	const [contactFormMap, setContactFormMap] = useState<
+		Record<string, ContactFormData>
+	>({});
 	const bottomRef = useRef<HTMLDivElement>(null);
 	const [isAtBottom, setIsAtBottom] = useState(true);
 
@@ -77,6 +86,16 @@ export function ChatWindow({ widget = false }: ChatWindowProps) {
 							}
 						}
 
+						// Extract contact form trigger from headers
+						const contactHeader = response.headers.get("X-Contact-Form");
+						if (contactHeader) {
+							try {
+								pendingContactRef.current = JSON.parse(contactHeader);
+							} catch {
+								// Invalid JSON, ignore
+							}
+						}
+
 						return response;
 					},
 				}),
@@ -87,6 +106,8 @@ export function ChatWindow({ widget = false }: ChatWindowProps) {
 	const { messages, sendMessage, status, error, regenerate } = useChat({
 		chat,
 	});
+
+	const isStreaming = status === "streaming" || status === "submitted";
 
 	// Track if user is at bottom using IntersectionObserver
 	useEffect(() => {
@@ -128,13 +149,28 @@ export function ChatWindow({ widget = false }: ChatWindowProps) {
 		}
 	}, [messages, sourcesMap._pending]);
 
+	// Associate pending contact form data with the latest assistant message
+	useEffect(() => {
+		if (!pendingContactRef.current || messages.length === 0 || isStreaming) {
+			return;
+		}
+		const lastMessage = messages[messages.length - 1];
+		if (lastMessage?.role === "assistant" && lastMessage.id) {
+			const data = pendingContactRef.current;
+			pendingContactRef.current = null;
+			setContactFormMap((prev) => ({
+				...prev,
+				[lastMessage.id]: data,
+			}));
+		}
+	}, [messages, isStreaming]);
+
 	const handleSendMessage = (message: string) => {
 		sendMessage({
 			text: message,
 		});
 	};
 
-	const isStreaming = status === "streaming" || status === "submitted";
 	const showTypingIndicator = isStreaming && messages.length > 0;
 	const messageCount = messages.length;
 	const showMessageLimitWarning = messageCount >= 30;
@@ -200,7 +236,9 @@ export function ChatWindow({ widget = false }: ChatWindowProps) {
 								sources={
 									msg.role === "assistant" ? sourcesMap[msg.id] : undefined
 								}
-								parts={msg.parts}
+								contactForm={
+									msg.role === "assistant" ? contactFormMap[msg.id] : undefined
+								}
 							/>
 						))}
 

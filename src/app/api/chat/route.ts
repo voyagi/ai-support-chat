@@ -1,5 +1,9 @@
 import { createOpenAI } from "@ai-sdk/openai";
-import { createUIMessageStream, streamText } from "ai";
+import {
+	createUIMessageStream,
+	createUIMessageStreamResponse,
+	streamText,
+} from "ai";
 import {
 	calculateAvailableBudget,
 	formatRagContext,
@@ -100,31 +104,30 @@ export async function POST(req: Request) {
 		});
 
 		// Check if we have a confident answer from the knowledge base
-		const hasConfidentAnswer = chunks.length > 0 && chunks[0].similarity > 0.7;
+		// pgvector scores exceed 1.0 because embeddings aren't L2-normalized.
+		// Observed: unrelated queries ~1.10, in-KB queries ~1.80+
+		const hasConfidentAnswer = chunks.length > 0 && chunks[0].similarity > 1.15;
 
 		// Low-confidence branch: return contact-form data part instead of calling LLM
 		if (!hasConfidentAnswer) {
 			const noAnswerText =
 				"I don't have information about that in my knowledge base. Let me connect you with our team who can help!";
 
-			// Create UI message stream with text + contact-form data part
+			// Create UI message stream with text-only response
+			const textPartId = "no-answer";
 			const stream = createUIMessageStream({
 				execute: async ({ writer }) => {
-					// Write the text content
-					await writer.write({
+					writer.write({ type: "start" });
+					writer.write({ type: "start-step" });
+					writer.write({ type: "text-start", id: textPartId });
+					writer.write({
 						type: "text-delta",
 						delta: noAnswerText,
-						id: "no-answer",
+						id: textPartId,
 					});
-
-					// Write the contact-form data part
-					await writer.write({
-						type: "data-contact-form",
-						data: {
-							conversationId,
-							originalQuestion: userMessage,
-						},
-					});
+					writer.write({ type: "text-end", id: textPartId });
+					writer.write({ type: "finish-step" });
+					writer.write({ type: "finish", finishReason: "stop" });
 				},
 			});
 
@@ -135,12 +138,16 @@ export async function POST(req: Request) {
 				},
 			);
 
-			// Return stream with conversation ID header (no sources for low-confidence)
-			return new Response(stream, {
+			// Return proper SSE response with contact form data in header
+			return createUIMessageStreamResponse({
+				stream,
 				status: 200,
 				headers: {
-					"Content-Type": "text/plain; charset=utf-8",
 					"X-Conversation-Id": conversationId,
+					"X-Contact-Form": JSON.stringify({
+						conversationId,
+						originalQuestion: userMessage,
+					}),
 				},
 			});
 		}

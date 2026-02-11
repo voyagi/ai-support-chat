@@ -1,7 +1,7 @@
 "use client";
 
 import { AlertCircle, Send } from "lucide-react";
-import { useId, useState } from "react";
+import { useState } from "react";
 
 interface ContactFormProps {
 	conversationId: string;
@@ -12,8 +12,8 @@ export function ContactForm({
 	conversationId,
 	originalQuestion,
 }: ContactFormProps) {
-	const nameId = useId();
-	const emailId = useId();
+	const nameId = `contact-name-${conversationId}`;
+	const emailId = `contact-email-${conversationId}`;
 	const [name, setName] = useState("");
 	const [email, setEmail] = useState("");
 	const [submitting, setSubmitting] = useState(false);
