@@ -1,0 +1,1 @@
+C:/Users/Eagi/My Drive (eagi333@gmail.com)/dotfiles/.claude/commands/debate.md
