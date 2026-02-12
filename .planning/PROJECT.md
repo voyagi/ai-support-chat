@@ -2,103 +2,121 @@
 
 ## What This Is
 
-A live, deployed AI customer support chatbot that serves as portfolio piece #1
-for an Upwork freelancing profile. Prospects click a demo link, interact with a
-RAG-powered chatbot answering questions about a fictional SaaS company
-("FlowBoard"), and see exactly what they'd get for their own business. Two UI
-modes: full-page chat and an embeddable Intercom-style widget.
+A live, deployed AI customer support chatbot (branded "FlowBoard") that serves
+as portfolio piece #1 for an Upwork freelancing profile. Prospects visit the
+demo URL, chat with a RAG-powered bot answering questions about a fictional
+PM SaaS company, upload their own documents to test the pipeline, and see
+exactly what they'd get for their own business. Two UI modes: full-page chat
+and an embeddable Intercom-style widget.
 
 ## Core Value
 
 A prospect interacts with the demo and thinks "I want this, but for my
-business" — that's the conversion moment. Everything serves this.
+business" - that's the conversion moment. Everything serves this.
+
+## Current State
+
+**Version:** v1.0 MVP - shipped 2026-02-12
+**Live URL:** https://upwork-ai-chatbot.vercel.app
+**Codebase:** 6,532 LOC TypeScript, 132 commits across 10 phases
+
+Shipped features:
+- Full-page chat with streaming responses and conversation history
+- RAG pipeline (pgvector, 18 FlowBoard docs, 223 chunks)
+- Embeddable widget (script tag + iframe, 2.9KB loader)
+- Admin panel (document management, analytics, embed code generator, contacts)
+- Dark mode with animations and micro-interactions
+- Out-of-KB handling with inline contact form
+- Rate limiting (20/hr + 100/day per IP) and $10/day cost cap
+- Sandbox mode for prospect document uploads
+- Production deployment on Vercel with branded OG cards
 
 ## Requirements
 
 ### Validated
 
-- ✓ Next.js 15 App Router scaffolding with TypeScript — existing
-- ✓ Tailwind CSS v4 + PostCSS pipeline configured — existing
-- ✓ OpenAI SDK (v5.1) + Supabase clients (browser + server) installed — existing
-- ✓ Biome linter/formatter configured — existing
-- ✓ cn() utility (clsx + tailwind-merge) — existing
-- ✓ Root layout with fonts and global styles — existing
+- ✓ Next.js 15 App Router scaffolding with TypeScript - existing
+- ✓ Tailwind CSS v4 + PostCSS pipeline configured - existing
+- ✓ OpenAI SDK (v5.1) + Supabase clients (browser + server) installed - existing
+- ✓ Biome linter/formatter configured - existing
+- ✓ cn() utility (clsx + tailwind-merge) - existing
+- ✓ Root layout with fonts and global styles - existing
+- ✓ Full-page chat UI with streaming responses - v1.0
+- ✓ RAG pipeline: embed user query, pgvector similarity search, context-grounded answer - v1.0
+- ✓ Embeddable widget (script tag + iframe, Intercom-style floating bubble) - v1.0
+- ✓ Widget mobile-first, full-screen on phones - v1.0
+- ✓ Admin panel with password gate - v1.0
+- ✓ Admin: knowledge base document management (upload, list, delete) - v1.0
+- ✓ Admin: "Try it yourself" sandbox mode - v1.0
+- ✓ Admin: copy-paste embed code snippet - v1.0
+- ✓ Admin: analytics dashboard (chat volume, common questions, response accuracy) - v1.0
+- ✓ Graceful out-of-KB handling: inline contact form - v1.0
+- ✓ Conversation history persisted in Supabase - v1.0
+- ✓ Dark mode with light/dark toggle - v1.0
+- ✓ Premium polish: animations, transitions, loading states, micro-interactions - v1.0
+- ✓ 18 realistic FlowBoard demo docs pre-loaded - v1.0
+- ✓ Landing page: zero-friction demo entry, no signup required - v1.0
+- ✓ Deploy to Vercel with live URL for Upwork profile - v1.0
+- ✓ Rate limiting (20 req/hour, 100 req/day per IP) - v1.0
+- ✓ Cost tracking with $10/day budget cap and email alerts - v1.0
 
 ### Active
 
-- [ ] Full-page chat UI with streaming responses
-- [ ] RAG pipeline: embed user query → pgvector similarity search → context-grounded answer
-- [ ] Embeddable widget (script tag + iframe, Intercom-style floating bubble)
-- [ ] Widget must be mobile-first and look perfect on phones
-- [ ] Admin panel with password gate (simple shared password)
-- [ ] Admin: knowledge base document management (upload, list, delete)
-- [ ] Admin: "Try it yourself" mode to upload docs and see RAG pipeline work
-- [ ] Admin: copy-paste embed code snippet (like Intercom's install page)
-- [ ] Admin: analytics dashboard (chat volume, common questions, response accuracy)
-- [ ] Graceful out-of-KB handling: inline contact form (name + email + question) instead of hallucination
-- [ ] Conversation history persisted in Supabase
-- [ ] Dark mode with light/dark toggle (must-have)
-- [ ] Premium polish: animations, transitions, loading states, micro-interactions
-- [ ] 15-20 realistic FlowBoard demo docs (pricing, FAQ, getting started, API docs, etc.)
-- [ ] Landing page: zero-friction demo entry, no signup required
-- [ ] Deploy to Vercel with live URL for Upwork profile
+(None - all v1 requirements shipped. Define new requirements with `/gsd:new-milestone`.)
 
 ### Out of Scope
 
-- Real authentication (OAuth, email/password signup) — demo project, password gate is enough
-- Multiple knowledge base support (different bots per business) — v2 if demand exists
-- "Was this helpful?" thumbs up/down feedback — excluded from v1 analytics
-- Real-time typing indicators — nice-to-have, defer unless trivial to add
-- PDF parsing for document upload — text-only in v1, PDF adds complexity
-- Rate limiting — demo project, low traffic expected
-- npm package for widget — script tag + iframe is simpler and targets broader audience
+- Real authentication (OAuth, email/password signup) - demo project, password gate is enough
+- Multiple knowledge base support (different bots per business) - v2 if demand exists
+- "Was this helpful?" thumbs up/down feedback - excluded from v1 analytics
+- PDF parsing for document upload - text/markdown only, PDF adds complexity
+- npm package for widget - script tag + iframe is simpler and targets broader audience
+- Voice input - adds permissions UX, mic detection, transcription costs
+- Conversation branching / decision trees - defeats RAG value prop
 
 ## Context
 
 **Purpose:** Portfolio piece #1 of 4 for Upwork freelancing. Demonstrates AI
 chatbot + RAG skills. Must be live and interactive, not a mockup.
 
-**Target audience:** Upwork prospects — business owners and product managers
-looking to add AI chat support to their products/sites. They range from
-e-commerce to SaaS to professional services.
+**Target audience:** Upwork prospects - business owners and product managers
+looking to add AI chat support to their products/sites.
 
-**Demo business:** "FlowBoard" — a fictional project management SaaS tool
+**Demo business:** "FlowBoard" - a fictional project management SaaS tool
 (similar to Asana/Linear). Free/Pro/Enterprise tiers, Kanban + timeline views,
 integrations, API. Chosen because PM tools have rich, relatable FAQ content.
 
-**Demo data strategy:** Claude generates all 15-20 docs during build. Content
-must feel real — not placeholder text. Docs include: pricing page, FAQ, getting
-started guide, API reference, integration guides, billing FAQ, team management
-guide, etc.
-
-**Existing codebase:** Next.js 15 scaffolding with OpenAI + Supabase + Biome
-configured. No feature code exists yet — all pages and API routes are planned
-but not built. See `.planning/codebase/` for full map.
+**Tech stack:** Next.js 15 (App Router), OpenAI API (gpt-4.1-mini), Supabase
+(pgvector), Tailwind CSS v4, Biome, Upstash Redis, Resend, Vercel.
 
 **Upwork strategy context:** Full strategy at
 `C:\Users\Eagi\Making money\side-projects\upwork-strategy.md`
 
 ## Constraints
 
-- **Tech stack**: Next.js 15, OpenAI API, Supabase (pgvector), Tailwind CSS v4, Biome — already configured, do not change
-- **AI model**: GPT-4o-mini for cost efficiency (gpt-4o fallback for complex queries)
+- **Tech stack**: Next.js 15, OpenAI API, Supabase (pgvector), Tailwind CSS v4, Biome
+- **AI model**: gpt-4.1-mini for cost efficiency, 300 token output cap
 - **Embeddings**: OpenAI text-embedding-3-small (1536 dimensions)
-- **Deployment**: Vercel — standard Next.js hosting
-- **Auth**: Simple password gate for admin only — no user auth system
-- **Budget**: Minimize OpenAI API costs — demo will have real traffic from prospects
-- **Polish**: Must feel premium — animations, dark mode, transitions. This IS the sales pitch.
+- **Deployment**: Vercel at https://upwork-ai-chatbot.vercel.app
+- **Auth**: Simple password gate for admin only
+- **Budget**: $10/day OpenAI cost cap, dual rate limiting per IP
+- **Polish**: Must feel premium - animations, dark mode, transitions
 
 ## Key Decisions
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| FlowBoard (PM SaaS) as demo business | Broad appeal, rich FAQ content, relatable to most Upwork clients | — Pending |
-| Script tag + iframe for widget | Matches Intercom UX, works on any site, simpler than npm package | — Pending |
-| Password gate instead of real auth | Demo project — no need for user management overhead | — Pending |
-| Inline contact form for out-of-KB | Shows lead capture value, builds trust by not hallucinating | — Pending |
-| Dark mode as must-have | "Feels premium" polish bar — dark mode signals attention to detail | — Pending |
-| Chat volume + common Qs + accuracy for analytics | Shows business value without overbuilding — satisfaction deferred to v2 | — Pending |
-| Admin "try it yourself" toggle | Proves RAG pipeline is real, not pre-canned — default read-only prevents abuse | — Pending |
+| FlowBoard (PM SaaS) as demo business | Broad appeal, rich FAQ content, relatable to most Upwork clients | ✓ Good - 18 docs feel authentic |
+| Script tag + iframe for widget | Matches Intercom UX, works on any site, simpler than npm package | ✓ Good - 2.9KB loader, works everywhere |
+| Password gate instead of real auth | Demo project, no user management overhead | ✓ Good - iron-session, simple and secure |
+| Inline contact form for out-of-KB | Shows lead capture value, builds trust by not hallucinating | ✓ Good - confidence threshold 0.7 |
+| Dark mode as must-have | "Feels premium" polish bar, signals attention to detail | ✓ Good - Tailwind v4 custom variant |
+| Chat volume + common Qs + accuracy for analytics | Shows business value without overbuilding | ✓ Good - Recharts, dark mode compatible |
+| Admin "try it yourself" sandbox toggle | Proves RAG pipeline is real, not pre-canned | ✓ Good - per-IP tenant isolation |
+| AI SDK v6 Chat + DefaultChatTransport | Latest Vercel AI SDK pattern for streaming | ✓ Good - parts format, clean API |
+| Upstash Redis for rate limiting | Distributed state for serverless, free tier | ✓ Good - dual limits, tighter-wins logic |
+| gpt-4.1-mini (not gpt-4o-mini) | gpt-4o-mini retiring Feb 13, future-proof | ✓ Good - seamless transition |
+| Direct tenant_id filtering over RLS | Serverless set_config unreliable | ✓ Good - simple, predictable |
 
 ---
-*Last updated: 2026-02-08 after initialization*
+*Last updated: 2026-02-12 after v1.0 milestone*
