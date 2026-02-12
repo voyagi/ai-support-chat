@@ -96,7 +96,7 @@ export default function Home() {
 							rel="noopener noreferrer"
 							className="underline hover:text-gray-600 dark:hover:text-gray-400 transition-colors"
 						>
-							Ahmad Elarabi
+							Yigal Khantsis
 						</a>{" "}
 						—{" "}
 						<Link

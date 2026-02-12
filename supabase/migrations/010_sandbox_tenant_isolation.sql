@@ -28,29 +28,33 @@ CREATE OR REPLACE FUNCTION match_document_chunks(
 RETURNS TABLE (
   id uuid,
   document_id uuid,
+  document_title text,
+  section_heading text,
   content text,
-  similarity float,
-  chunk_index int,
-  metadata jsonb
+  chunk_position int,
+  total_chunks int,
+  similarity float
 )
 LANGUAGE sql STABLE
 AS $$
   SELECT
     dc.id,
     dc.document_id,
+    dc.document_title,
+    dc.section_heading,
     dc.content,
-    1 - (dc.embedding <=> query_embedding) AS similarity,
-    dc.chunk_index,
-    dc.metadata
+    dc.chunk_position,
+    dc.total_chunks,
+    1 - (dc.embedding <#> query_embedding) AS similarity
   FROM document_chunks dc
   WHERE
-    1 - (dc.embedding <=> query_embedding) > match_threshold
+    1 - (dc.embedding <#> query_embedding) > match_threshold
     AND (
       -- If tenant_id is provided, include both main KB and tenant docs
       -- If tenant_id is NULL, only include main KB docs
       (tenant_id IS NULL AND dc.tenant_id IS NULL)
       OR (tenant_id IS NOT NULL AND (dc.tenant_id IS NULL OR dc.tenant_id = tenant_id))
     )
-  ORDER BY dc.embedding <=> query_embedding
+  ORDER BY dc.embedding <#> query_embedding
   LIMIT match_count;
 $$;
