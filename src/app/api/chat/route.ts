@@ -16,11 +16,7 @@ import {
 	saveMessages,
 } from "@/lib/chat/conversation";
 import { buildSystemPrompt } from "@/lib/chat/prompt";
-import {
-	checkBudgetRemaining,
-	getCurrentCost,
-	trackChatCost,
-} from "@/lib/cost-tracking";
+import { checkBudgetRemaining, trackChatCost } from "@/lib/cost-tracking";
 import { countTokens } from "@/lib/embeddings/token-counter";
 import { searchSimilarChunks } from "@/lib/rag/similarity-search";
 import { getIpFromRequest, getTenantIdFromIp } from "@/lib/sandbox/tenant-id";

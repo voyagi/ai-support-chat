@@ -46,6 +46,15 @@ export function ChatWindow({ widget = false }: ChatWindowProps) {
 	const bottomRef = useRef<HTMLDivElement>(null);
 	const [isAtBottom, setIsAtBottom] = useState(true);
 
+	// Rate limit state
+	const [rateLimitRemaining, setRateLimitRemaining] = useState<number | null>(
+		null,
+	);
+	const [rateLimitReset, setRateLimitReset] = useState<string | null>(null);
+	const [rateLimitHit, setRateLimitHit] = useState(false);
+	const [budgetExceeded, setBudgetExceeded] = useState(false);
+	const [countdown, setCountdown] = useState<number>(0);
+
 	// Create chat instance with DefaultChatTransport (stable — no state deps)
 	const chat = useMemo(
 		() =>
@@ -93,6 +102,36 @@ export function ChatWindow({ widget = false }: ChatWindowProps) {
 								pendingContactRef.current = JSON.parse(contactHeader);
 							} catch {
 								// Invalid JSON, ignore
+							}
+						}
+
+						// Extract rate limit headers
+						const remaining = response.headers.get("X-RateLimit-Remaining");
+						const reset = response.headers.get("X-RateLimit-Reset");
+						if (remaining !== null) {
+							setRateLimitRemaining(Number.parseInt(remaining, 10));
+						}
+						if (reset !== null) {
+							setRateLimitReset(reset);
+						}
+
+						// Handle rate limit exceeded (429)
+						if (response.status === 429) {
+							setRateLimitHit(true);
+							if (reset) {
+								setRateLimitReset(reset);
+							}
+						}
+
+						// Handle budget exceeded (503)
+						if (response.status === 503) {
+							try {
+								const errorData = await response.clone().json();
+								if (errorData.budgetExceeded) {
+									setBudgetExceeded(true);
+								}
+							} catch {
+								// Not JSON or can't parse, ignore
 							}
 						}
 
@@ -165,6 +204,29 @@ export function ChatWindow({ widget = false }: ChatWindowProps) {
 		}
 	}, [messages, isStreaming]);
 
+	// Countdown timer for rate limit reset
+	useEffect(() => {
+		if (!rateLimitHit || !rateLimitReset) {
+			return;
+		}
+
+		const updateCountdown = () => {
+			const resetTime = new Date(rateLimitReset).getTime();
+			const now = Date.now();
+			const secondsRemaining = Math.max(0, Math.ceil((resetTime - now) / 1000));
+			setCountdown(secondsRemaining);
+
+			if (secondsRemaining === 0) {
+				setRateLimitHit(false);
+			}
+		};
+
+		updateCountdown();
+		const interval = setInterval(updateCountdown, 1000);
+
+		return () => clearInterval(interval);
+	}, [rateLimitHit, rateLimitReset]);
+
 	const handleSendMessage = (message: string) => {
 		sendMessage({
 			text: message,
@@ -174,6 +236,24 @@ export function ChatWindow({ widget = false }: ChatWindowProps) {
 	const showTypingIndicator = isStreaming && messages.length > 0;
 	const messageCount = messages.length;
 	const showMessageLimitWarning = messageCount >= 30;
+
+	// Compute rate limit warning and message
+	const rateLimitWarning =
+		rateLimitRemaining !== null && rateLimitRemaining <= 4
+			? `You have ${rateLimitRemaining} messages left`
+			: undefined;
+
+	const rateLimitMessage = rateLimitHit
+		? (() => {
+				const minutes = Math.floor(countdown / 60);
+				const seconds = countdown % 60;
+				const timeString =
+					minutes > 0
+						? `${minutes} minute${minutes > 1 ? "s" : ""}`
+						: `${seconds} second${seconds !== 1 ? "s" : ""}`;
+				return `You've reached the demo limit. Try again in ${timeString}. Want this for your business? Get in touch.`;
+			})()
+		: undefined;
 
 	return (
 		<div className={cn("flex flex-col", widget ? "h-full" : "h-screen")}>
@@ -290,6 +370,10 @@ export function ChatWindow({ widget = false }: ChatWindowProps) {
 						onSubmit={handleSendMessage}
 						disabled={isStreaming}
 						placeholder="Ask about FlowBoard..."
+						rateLimitWarning={rateLimitWarning}
+						rateLimitHit={rateLimitHit}
+						rateLimitMessage={rateLimitMessage}
+						budgetExceeded={budgetExceeded}
 					/>
 				</div>
 			</div>
