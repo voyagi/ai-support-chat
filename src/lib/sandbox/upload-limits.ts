@@ -1,11 +1,7 @@
 import { createServiceRoleClient } from "@/lib/supabase/server";
+import { SANDBOX_LIMITS } from "./constants";
 
-export const SANDBOX_LIMITS = {
-	maxDocuments: 3,
-	maxPagesPerDoc: 10,
-	allowedTypes: [".txt", ".md", ".pdf"],
-	maxFileSizeMb: 5,
-} as const;
+export { SANDBOX_LIMITS };
 
 export interface SandboxLimitCheck {
 	allowed: boolean;
