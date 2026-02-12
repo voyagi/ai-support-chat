@@ -16,7 +16,13 @@ import {
 	saveMessages,
 } from "@/lib/chat/conversation";
 import { buildSystemPrompt } from "@/lib/chat/prompt";
-import { checkBudgetRemaining, trackChatCost } from "@/lib/cost-tracking";
+import { sendCostAlertEmail } from "@/lib/cost-alerts";
+import {
+	checkBudgetRemaining,
+	checkCostAlerts,
+	getCurrentCost,
+	trackChatCost,
+} from "@/lib/cost-tracking";
 import { countTokens } from "@/lib/embeddings/token-counter";
 import { searchSimilarChunks } from "@/lib/rag/similarity-search";
 import { getIpFromRequest, getTenantIdFromIp } from "@/lib/sandbox/tenant-id";
@@ -240,9 +246,21 @@ export async function POST(req: Request) {
 				);
 				const inputTokens = systemTokens + historyTokens;
 
-				trackChatCost(inputTokens, outputTokens).catch((err) => {
-					console.error("Failed to track cost:", err);
-				});
+				trackChatCost(inputTokens, outputTokens)
+					.then(async () => {
+						// Check if we hit a cost alert threshold
+						const updatedCost = await getCurrentCost();
+						const alert = checkCostAlerts(updatedCost);
+
+						if (alert.level === "warning" || alert.level === "critical") {
+							sendCostAlertEmail(updatedCost, alert.level).catch((err) => {
+								console.error("Failed to send cost alert email:", err);
+							});
+						}
+					})
+					.catch((err) => {
+						console.error("Failed to track cost:", err);
+					});
 			},
 		});
 

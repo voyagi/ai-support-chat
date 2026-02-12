@@ -1,6 +1,7 @@
 import { Bot, LogOut } from "lucide-react";
 import Link from "next/link";
 import { logout } from "@/app/actions/auth";
+import { CostAlertBanner } from "@/components/admin/CostAlertBanner";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { getSession } from "@/lib/auth/session";
 
@@ -90,6 +91,9 @@ export default async function AdminLayout({
 					</div>
 				</div>
 			</nav>
+
+			{/* Cost Alert Banner */}
+			<CostAlertBanner />
 
 			{/* Page Content */}
 			<main>{children}</main>
