@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-08)
 Phase: 10 of 10 (Production Hardening)
 Plan: 2 of 2 in current phase
 Status: Complete
-Last activity: 2026-02-12 - Completed 10-02-PLAN.md (sandbox mode with tenant isolation)
+Last activity: 2026-02-12 - Completed 10-01-PLAN.md (rate limiting and cost tracking)
 
 Progress: [████████████████████░] 100% (24 of 24 plans)
 
@@ -20,9 +20,9 @@ Progress: [████████████████████░] 100%
 
 ### Velocity
 
-- Total plans completed: 22
-- Average duration: 7.0 min
-- Total execution time: 2.57 hours
+- Total plans completed: 23
+- Average duration: 7.5 min
+- Total execution time: 2.88 hours
 
 ### By Phase
 
@@ -37,12 +37,12 @@ Progress: [████████████████████░] 100%
 | 07-embed-code-generator | 2/2 | 8min | 4.0min |
 | 08-analytics-dashboard | 2/2 | 11min | 5.5min |
 | 09-out-of-kb-handling | 2/2 | 20min | 10.0min |
-| 10-production-hardening | 2/2 | 14min | 7.0min |
+| 10-production-hardening | 2/2 | 41min | 20.5min |
 
 ### Recent Trend
 
-- Last 5 plans: 09-01 (5min), 09-02 (15min), 10-01 (6min), 10-02 (8min)
-- Trend: Phase 10 complete - production hardening with rate limiting and sandbox mode.
+- Last 5 plans: 09-02 (15min), 10-02 (8min), 10-01 (27min)
+- Trend: Phase 10 complete - production hardening with dual rate limiting, cost tracking, email alerts, and sandbox mode.
 
 *Updated after each plan completion*
 
@@ -130,8 +130,12 @@ Recent decisions affecting current work:
 - [Phase 09-02]: Status badges with semantic color coding (amber=pending, blue=contacted, green=resolved)
 - [Phase 09-02]: Responsive ContactsTable with desktop table and mobile card layouts
 - [Phase 09-02]: Amber/warm tones for contact form signals "needs attention" without alarm
-- [Phase 10-01]: 20 req/hour + 100 req/day dual rate limits with exponential backoff (Uptime Robot safety)
-- [Phase 10-01]: Rate limit warnings at 90% with disabled send button when exceeded
+- [Phase 10-01]: 20 req/hour + 100 req/day dual rate limits enforcing tighter limit per IP (Upstash Redis)
+- [Phase 10-01]: Rate limit warnings at 80% (4 messages left) with countdown timer when exceeded
+- [Phase 10-01]: Token-based cost tracking with $10 daily budget cap, returns 503 when exceeded
+- [Phase 10-01]: Email alerts at 50%/80% cost thresholds via Resend with Redis deduplication
+- [Phase 10-01]: Admin cost alert banner with color-coded severity (amber/red)
+- [Phase 10-01]: maxOutputTokens reduced to 300 (from 1024) to control OpenAI costs
 - [Phase 10-02]: IP-based tenant IDs via SHA-256 hashing for sandbox mode (no auth required)
 - [Phase 10-02]: Direct tenant_id filtering instead of RLS (serverless set_config unreliable)
 - [Phase 10-02]: match_document_chunks RPC with optional tenant_id returns main KB + tenant docs
@@ -148,6 +152,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-12T09:41:52Z
-Stopped at: Completed 10-02-PLAN.md (sandbox mode with tenant isolation)
+Last session: 2026-02-12T10:00:08Z
+Stopped at: Completed 10-01-PLAN.md (rate limiting and cost tracking)
 Resume file: None
