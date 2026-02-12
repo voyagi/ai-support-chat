@@ -10,9 +10,11 @@ create table if not exists documents (
   id uuid primary key default gen_random_uuid(),
   title text not null,
   content text not null,
+  tenant_id text,
   created_at timestamptz default now(),
-  -- Unique constraint to prevent duplicate uploads and enable re-upload detection
-  constraint documents_title_key unique (title)
+  -- Tenant-aware unique constraint: prevents duplicate titles per tenant
+  -- NULL tenant_id = main KB, non-NULL = per-tenant sandbox uploads
+  constraint documents_title_tenant_key unique nulls not distinct (title, tenant_id)
 );
 
 -- Document chunks table: stores chunked documents with embeddings and enriched metadata
@@ -28,6 +30,7 @@ create table if not exists document_chunks (
   total_chunks int not null,
   -- OpenAI embeddings are normalized, so we use inner product for similarity
   embedding vector(1536),
+  tenant_id text,
   created_at timestamptz default now()
 );
 
@@ -59,7 +62,8 @@ create table if not exists messages (
 create or replace function match_document_chunks(
   query_embedding vector(1536),
   match_threshold float,
-  match_count int
+  match_count int,
+  tenant_id text default null
 )
 returns table (
   id uuid,
@@ -81,10 +85,14 @@ as $$
     dc.content,
     dc.chunk_position,
     dc.total_chunks,
-    -- Convert negative inner product to similarity score (0-1 range)
     1 - (dc.embedding <#> query_embedding) as similarity
   from document_chunks dc
-  where 1 - (dc.embedding <#> query_embedding) > match_threshold
+  where
+    1 - (dc.embedding <#> query_embedding) > match_threshold
+    and (
+      (tenant_id is null and dc.tenant_id is null)
+      or (tenant_id is not null and (dc.tenant_id is null or dc.tenant_id = tenant_id))
+    )
   order by dc.embedding <#> query_embedding
   limit match_count;
 $$;
