@@ -5,24 +5,24 @@
 See: .planning/PROJECT.md (updated 2026-02-08)
 
 **Core value:** A prospect interacts with the demo and thinks "I want this, but for my business"
-**Current focus:** Phase 9 in progress — Out-of-KB Handling
+**Current focus:** Phase 10 in progress — Production Hardening
 
 ## Current Position
 
-Phase: 9 of 10 (Out-of-KB Handling)
+Phase: 10 of 10 (Production Hardening)
 Plan: 2 of 2 in current phase
 Status: Complete
-Last activity: 2026-02-10 - Completed 09-02-PLAN.md (contact form UI and admin dashboard)
+Last activity: 2026-02-12 - Completed 10-02-PLAN.md (sandbox mode with tenant isolation)
 
-Progress: [████████████████████░] 100% (22 of 22 plans)
+Progress: [████████████████████░] 100% (24 of 24 plans)
 
 ## Performance Metrics
 
 ### Velocity
 
-- Total plans completed: 20
-- Average duration: 6.8 min
-- Total execution time: 2.58 hours
+- Total plans completed: 22
+- Average duration: 7.0 min
+- Total execution time: 2.57 hours
 
 ### By Phase
 
@@ -35,13 +35,14 @@ Progress: [████████████████████░] 100%
 | 05-dark-mode-polish | 2/2 | 17min | 8.5min |
 | 06-embeddable-widget | 3/3 | 12min | 4.0min |
 | 07-embed-code-generator | 2/2 | 8min | 4.0min |
-| 08-analytics-dashboard | 2/2 | TBD | TBD |
+| 08-analytics-dashboard | 2/2 | 11min | 5.5min |
 | 09-out-of-kb-handling | 2/2 | 20min | 10.0min |
+| 10-production-hardening | 2/2 | 14min | 7.0min |
 
 ### Recent Trend
 
-- Last 5 plans: 08-01, 08-02, 09-01 (5min), 09-02 (15min)
-- Trend: Phase 9 complete - out-of-KB handling with contact form and admin dashboard.
+- Last 5 plans: 09-01 (5min), 09-02 (15min), 10-01 (6min), 10-02 (8min)
+- Trend: Phase 10 complete - production hardening with rate limiting and sandbox mode.
 
 *Updated after each plan completion*
 
@@ -129,6 +130,13 @@ Recent decisions affecting current work:
 - [Phase 09-02]: Status badges with semantic color coding (amber=pending, blue=contacted, green=resolved)
 - [Phase 09-02]: Responsive ContactsTable with desktop table and mobile card layouts
 - [Phase 09-02]: Amber/warm tones for contact form signals "needs attention" without alarm
+- [Phase 10-01]: 20 req/hour + 100 req/day dual rate limits with exponential backoff (Uptime Robot safety)
+- [Phase 10-01]: Rate limit warnings at 90% with disabled send button when exceeded
+- [Phase 10-02]: IP-based tenant IDs via SHA-256 hashing for sandbox mode (no auth required)
+- [Phase 10-02]: Direct tenant_id filtering instead of RLS (serverless set_config unreliable)
+- [Phase 10-02]: match_document_chunks RPC with optional tenant_id returns main KB + tenant docs
+- [Phase 10-02]: SANDBOX_LIMITS extracted to constants.ts (client/server split pattern)
+- [Phase 10-02]: 24-hour tenant data retention with Vercel Cron daily cleanup at 3 AM UTC
 
 ### Pending Todos
 
@@ -140,6 +148,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-10T21:31:38Z
-Stopped at: Completed 09-02-PLAN.md (contact form UI and admin dashboard)
+Last session: 2026-02-12T09:41:52Z
+Stopped at: Completed 10-02-PLAN.md (sandbox mode with tenant isolation)
 Resume file: None
