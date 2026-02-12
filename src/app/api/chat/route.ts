@@ -21,9 +21,9 @@ import {
 	getCurrentCost,
 	trackChatCost,
 } from "@/lib/cost-tracking";
-import { getIpFromRequest, getTenantIdFromIp } from "@/lib/sandbox/tenant-id";
 import { countTokens } from "@/lib/embeddings/token-counter";
 import { searchSimilarChunks } from "@/lib/rag/similarity-search";
+import { getIpFromRequest, getTenantIdFromIp } from "@/lib/sandbox/tenant-id";
 
 interface MessagePart {
 	type: string;

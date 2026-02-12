@@ -15,6 +15,7 @@ export interface SimilarChunk {
 interface SearchOptions {
 	threshold?: number;
 	count?: number;
+	tenantId?: string;
 }
 
 /**
@@ -42,11 +43,23 @@ export async function searchSimilarChunks(
 
 	// Query Supabase using RPC function
 	const supabase = createServiceRoleClient();
-	const { data, error } = await supabase.rpc("match_document_chunks", {
+
+	// Build RPC parameters, conditionally including tenant_id
+	const rpcParams: Record<string, unknown> = {
 		query_embedding: queryEmbedding,
 		match_threshold: threshold,
 		match_count: count,
-	});
+	};
+
+	// Add tenant_id if provided (enables multi-tenant RAG search)
+	if (options?.tenantId) {
+		rpcParams.tenant_id = options.tenantId;
+	}
+
+	const { data, error } = await supabase.rpc(
+		"match_document_chunks",
+		rpcParams,
+	);
 
 	if (error) {
 		throw new Error(
