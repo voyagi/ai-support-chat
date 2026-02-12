@@ -16,6 +16,12 @@ import {
 	saveMessages,
 } from "@/lib/chat/conversation";
 import { buildSystemPrompt } from "@/lib/chat/prompt";
+import {
+	checkBudgetRemaining,
+	getCurrentCost,
+	trackChatCost,
+} from "@/lib/cost-tracking";
+import { getIpFromRequest, getTenantIdFromIp } from "@/lib/sandbox/tenant-id";
 import { countTokens } from "@/lib/embeddings/token-counter";
 import { searchSimilarChunks } from "@/lib/rag/similarity-search";
 
@@ -51,11 +57,24 @@ function extractMessageText(message: ChatMessage): string {
 
 export async function POST(req: Request) {
 	try {
-		// 1. Parse request body
+		// 1. Check budget before processing any requests
+		const budgetCheck = await checkBudgetRemaining();
+		if (!budgetCheck.allowed) {
+			return Response.json(
+				{
+					error:
+						"Demo temporarily unavailable due to high usage. Please try again tomorrow.",
+					budgetExceeded: true,
+				},
+				{ status: 503 },
+			);
+		}
+
+		// 2. Parse request body
 		const body = (await req.json()) as RequestBody;
 		const { messages, conversationId: incomingConversationId } = body;
 
-		// 2. Validate input
+		// 3. Validate input
 		if (!messages || !Array.isArray(messages) || messages.length === 0) {
 			return Response.json(
 				{ error: "Messages array is required and must not be empty" },
@@ -79,7 +98,7 @@ export async function POST(req: Request) {
 			);
 		}
 
-		// 3. Check message cap
+		// 4. Check message cap
 		if (incomingConversationId) {
 			const messageCount = await getMessageCount(incomingConversationId);
 			if (messageCount >= MAX_MESSAGES_PER_CONVERSATION) {
@@ -93,14 +112,22 @@ export async function POST(req: Request) {
 			}
 		}
 
-		// 4. Create conversation if needed (BEFORE streaming to prevent race condition)
+		// 5. Create conversation if needed (BEFORE streaming to prevent race condition)
 		const conversationId =
 			incomingConversationId || (await createConversation());
 
-		// 5. RAG retrieval
+		// 6. Get tenant ID if sandbox mode is enabled
+		let tenantId: string | undefined;
+		if (process.env.NEXT_PUBLIC_SANDBOX_ENABLED === "true") {
+			const ip = getIpFromRequest(req);
+			tenantId = getTenantIdFromIp(ip);
+		}
+
+		// 6. RAG retrieval
 		const chunks = await searchSimilarChunks(userMessage, {
 			threshold: 0.7,
 			count: 5,
+			tenantId,
 		});
 
 		// Check if we have a confident answer from the knowledge base
@@ -164,7 +191,7 @@ export async function POST(req: Request) {
 		// Format all chunks for RAG context
 		const ragContext = formatRagContext(chunks);
 
-		// 6. Build context
+		// 7. Build context
 		const systemPrompt = buildSystemPrompt(ragContext);
 		const systemTokens = countTokens(systemPrompt);
 		const ragTokens = countTokens(ragContext);
@@ -184,7 +211,7 @@ export async function POST(req: Request) {
 			content: msg.content,
 		}));
 
-		// 7. Stream response
+		// 8. Stream response
 		const openaiProvider = createOpenAI({
 			apiKey: process.env.OPENAI_API_KEY,
 		});
@@ -194,22 +221,36 @@ export async function POST(req: Request) {
 			system: systemPrompt,
 			messages: coreMessages,
 			abortSignal: req.signal,
-			maxOutputTokens: 1024,
+			maxOutputTokens: 300,
 			temperature: 0.7,
-			// 8. Fire-and-forget persistence
+			// 9. Fire-and-forget persistence and cost tracking
 			onFinish: async ({ text }) => {
 				// Determine if answer was grounded in KB (chunks found with sufficient similarity)
 				const answeredFromKb = chunks.length > 0 && chunks[0].similarity > 0.7;
 
+				// Save conversation
 				saveMessages(conversationId, userMessage, text, answeredFromKb).catch(
 					(err) => {
 						console.error("Failed to persist conversation:", err);
 					},
 				);
+
+				// Track cost (fire-and-forget, never throw)
+				const outputTokens = countTokens(text);
+				// Calculate total input tokens: system + RAG + selected history messages
+				const historyTokens = selectedHistory.reduce(
+					(sum, msg) => sum + countTokens(msg.content),
+					0,
+				);
+				const inputTokens = systemTokens + historyTokens;
+
+				trackChatCost(inputTokens, outputTokens).catch((err) => {
+					console.error("Failed to track cost:", err);
+				});
 			},
 		});
 
-		// 9. Return streaming response with citation metadata
+		// 10. Return streaming response with citation metadata
 		// Use toUIMessageStreamResponse for proper AI SDK v6 streaming
 		const headers: Record<string, string> = {
 			"X-Conversation-Id": conversationId,
