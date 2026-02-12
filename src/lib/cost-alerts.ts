@@ -1,6 +1,5 @@
 import { Redis } from "@upstash/redis";
 import { Resend } from "resend";
-import type { AlertLevel } from "@/lib/cost-tracking";
 
 const redis = Redis.fromEnv();
 

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 export const metadata: Metadata = {
-	title: "AI Support Chat — Live Demo",
+	title: "FlowBoard - AI Customer Support Demo",
 	description:
 		"Interactive AI customer support chatbot demo. Powered by RAG, streaming AI, and a knowledge base. Try it instantly — no signup required.",
 };
@@ -20,12 +20,12 @@ export default function Home() {
 			<section className="min-h-screen flex flex-col items-center justify-center px-4 py-16 sm:py-24">
 				<div className="max-w-4xl mx-auto text-center">
 					<h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">
-						AI Support Chat
+						FlowBoard
 					</h1>
 					<p className="text-lg sm:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mt-6 leading-relaxed">
-						See how AI-powered customer support works. Ask questions, get
-						instant answers from a knowledge base — powered by RAG and streaming
-						AI.
+						AI-powered customer support for any business. Ask questions, get
+						instant answers from your knowledge base — powered by RAG and
+						streaming AI.
 					</p>
 
 					{/* Primary CTA */}
@@ -85,17 +85,26 @@ export default function Home() {
 
 				{/* Footer/Attribution */}
 				<div className="text-center mt-16 sm:mt-24">
-					<p className="text-sm text-gray-500 dark:text-gray-500">
-						Built as a portfolio demo —{" "}
+					<p className="text-sm text-gray-500 dark:text-gray-500 mb-2">
+						AI-powered customer support for any business
+					</p>
+					<p className="text-xs text-gray-400 dark:text-gray-600">
+						Built by{" "}
+						<a
+							href="https://www.upwork.com/freelancers/~01bc29ad4d29cf7c8b"
+							target="_blank"
+							rel="noopener noreferrer"
+							className="underline hover:text-gray-600 dark:hover:text-gray-400 transition-colors"
+						>
+							Ahmad Elarabi
+						</a>{" "}
+						—{" "}
 						<Link
 							href="/admin"
-							className="underline hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+							className="underline hover:text-gray-600 dark:hover:text-gray-400 transition-colors"
 						>
 							Admin Panel
 						</Link>
-					</p>
-					<p className="text-xs text-gray-400 dark:text-gray-600 mt-2">
-						Powered by Next.js, OpenAI, and Supabase
 					</p>
 				</div>
 			</section>
