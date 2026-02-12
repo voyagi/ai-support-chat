@@ -21,8 +21,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 6: Embeddable Widget** - Widget page, loader script, iframe isolation
 - [x] **Phase 7: Embed Code Generator** - Admin copy-paste snippet, syntax highlighting, preview
 - [x] **Phase 8: Analytics Dashboard** - Chat volume, common questions, accuracy tracking
-- [ ] **Phase 9: Out-of-KB Handling** - Contact form fallback, confidence thresholds, hallucination prevention
-- [ ] **Phase 10: Production Hardening** - Rate limiting, cost controls, deployment to Vercel
+- [x] **Phase 9: Out-of-KB Handling** - Contact form fallback, confidence thresholds, hallucination prevention
+- [x] **Phase 10: Production Hardening** - Rate limiting, cost controls, deployment to Vercel
 
 ## Phase Details
 
@@ -248,5 +248,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 6. Embeddable Widget | 3/3 | Complete | 2026-02-09 |
 | 7. Embed Code Generator | 2/2 | Complete | 2026-02-09 |
 | 8. Analytics Dashboard | 2/2 | Complete | 2026-02-10 |
-| 9. Out-of-KB Handling | 0/0 | Not started | - |
-| 10. Production Hardening | 0/0 | Not started | - |
+| 9. Out-of-KB Handling | 2/2 | Complete | 2026-02-10 |
+| 10. Production Hardening | 3/3 | Complete | 2026-02-12 |
