@@ -1,7 +1,7 @@
-import { Redis } from "@upstash/redis";
 import { Resend } from "resend";
+import { getRedis } from "@/lib/redis";
 
-const redis = Redis.fromEnv();
+const redis = getRedis();
 
 function getResendClient(): Resend | null {
 	const apiKey = process.env.RESEND_API_KEY;

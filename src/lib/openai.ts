@@ -2,10 +2,7 @@ import OpenAI from "openai";
 
 let _openaiClient: OpenAI | null = null;
 
-/**
- * Get OpenAI client instance (lazy-loaded)
- */
-export function getOpenAIClient(): OpenAI {
+function getClient(): OpenAI {
 	if (!_openaiClient) {
 		_openaiClient = new OpenAI({
 			apiKey: process.env.OPENAI_API_KEY,
@@ -14,9 +11,9 @@ export function getOpenAIClient(): OpenAI {
 	return _openaiClient;
 }
 
-// Export as named constant for backward compatibility
+/** Lazy-initialized OpenAI client singleton. */
 export const openai = new Proxy({} as OpenAI, {
 	get(_target, prop) {
-		return getOpenAIClient()[prop as keyof OpenAI];
+		return getClient()[prop as keyof OpenAI];
 	},
 });

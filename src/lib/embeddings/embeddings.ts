@@ -1,3 +1,4 @@
+import { getErrorMessage } from "@/lib/errors";
 import { openai } from "@/lib/openai";
 import { countTokens, isWithinTokenLimit } from "./token-counter";
 
@@ -32,7 +33,7 @@ export async function generateEmbedding(text: string): Promise<number[]> {
 		return response.data[0].embedding;
 	} catch (error) {
 		throw new Error(
-			`Failed to generate embedding for text (${countTokens(processedText)} tokens): ${error instanceof Error ? error.message : String(error)}`,
+			`Failed to generate embedding for text (${countTokens(processedText)} tokens): ${getErrorMessage(error)}`,
 		);
 	}
 }
@@ -85,7 +86,7 @@ export async function generateEmbeddings(texts: string[]): Promise<number[][]> {
 		return allEmbeddings;
 	} catch (error) {
 		throw new Error(
-			`Failed to generate embeddings for ${texts.length} texts: ${error instanceof Error ? error.message : String(error)}`,
+			`Failed to generate embeddings for ${texts.length} texts: ${getErrorMessage(error)}`,
 		);
 	}
 }

@@ -2,8 +2,11 @@
 
 import { revalidatePath } from "next/cache";
 import { getSession } from "@/lib/auth/session";
-import { chunkMarkdown } from "@/lib/embeddings/chunker";
-import { generateEmbeddings } from "@/lib/embeddings/embeddings";
+import {
+	extractDocumentTitle,
+	processDocumentUpload,
+} from "@/lib/documents/upload";
+import { getErrorMessage } from "@/lib/errors";
 import { createServiceRoleClient } from "@/lib/supabase/server";
 
 export interface DocumentListItem {
@@ -25,8 +28,8 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ALLOWED_EXTENSIONS = [".txt", ".md"];
 
 /**
- * Upload a document: validate, insert, chunk, embed, store chunks
- * Cleans up orphan document if embedding fails
+ * Upload a document: validate, insert, chunk, embed, store chunks.
+ * Delegates core pipeline to shared processDocumentUpload().
  */
 export async function uploadDocument(formData: FormData): Promise<{
 	success: boolean;
@@ -64,86 +67,23 @@ export async function uploadDocument(formData: FormData): Promise<{
 		};
 	}
 
-	const supabase = createServiceRoleClient();
-	let documentId: string | undefined;
-
 	try {
-		// Read file content
 		const content = await file.text();
-
-		// Extract title: formData override > first # heading > filename
 		const titleOverride = formData.get("title") as string | null;
-		let title: string;
-		if (titleOverride?.trim()) {
-			title = titleOverride.trim();
-		} else {
-			const headingMatch = content.match(/^#\s+(.+)$/m);
-			title = headingMatch
-				? headingMatch[1].trim()
-				: file.name.replace(/\.(txt|md)$/i, "");
-		}
+		const title = extractDocumentTitle(content, file.name, titleOverride);
 
-		// Insert document record
-		const { data: document, error: docError } = await supabase
-			.from("documents")
-			.insert({ title, content })
-			.select("id")
-			.single();
-
-		if (docError || !document) {
-			throw new Error(
-				`Failed to insert document: ${docError?.message ?? "Unknown error"}`,
-			);
-		}
-
-		documentId = document.id;
-
-		// Chunk the content
-		const chunks = chunkMarkdown({ title, content });
-
-		if (chunks.length === 0) {
-			// Document was empty or below minimum chunk threshold -- keep doc but no chunks
-			revalidatePath("/admin");
-			return { success: true, documentId, chunkCount: 0 };
-		}
-
-		// Generate embeddings for all chunks
-		const chunkTexts = chunks.map((chunk) => chunk.content);
-		const embeddings = await generateEmbeddings(chunkTexts);
-
-		// Prepare chunk records with all metadata
-		const chunkRecords = chunks.map((chunk, index) => ({
-			document_id: documentId,
-			document_title: chunk.documentTitle,
-			section_heading: chunk.sectionHeading,
-			content: chunk.content,
-			chunk_position: chunk.position,
-			total_chunks: chunk.totalChunks,
-			embedding: embeddings[index],
-		}));
-
-		// Insert chunks with embeddings
-		const { error: chunksError } = await supabase
-			.from("document_chunks")
-			.insert(chunkRecords);
-
-		if (chunksError) {
-			throw new Error(`Failed to insert chunks: ${chunksError.message}`);
-		}
+		const result = await processDocumentUpload(content, title);
 
 		revalidatePath("/admin");
-		return { success: true, documentId, chunkCount: chunks.length };
+		return {
+			success: true,
+			documentId: result.documentId,
+			chunkCount: result.chunkCount,
+		};
 	} catch (error) {
-		// Clean up orphan document if embedding/chunking failed after insert
-		if (documentId) {
-			await supabase.from("documents").delete().eq("id", documentId);
-		}
 		return {
 			success: false,
-			error:
-				error instanceof Error
-					? error.message
-					: "An unexpected error occurred during upload",
+			error: getErrorMessage(error),
 		};
 	}
 }

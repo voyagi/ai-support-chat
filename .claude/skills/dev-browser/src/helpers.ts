@@ -13,113 +13,77 @@ import { writeFileSync } from "fs";
 // ============================================================================
 
 /**
- * Take a screenshot using raw CDP WebSocket. Use this instead of page.screenshot()
- * which hangs in extension mode due to a Chromium bug (#377715191).
+ * Take a screenshot using CDP directly. Use this instead of page.screenshot()
+ * which hangs in extension mode due to a Chromium font-loading bug.
  *
- * This bypasses Playwright entirely — Playwright's focus emulation triggers a
- * deadlock in Chrome when multiple tabs/connections exist. The raw CDP approach
- * disables focus emulation before capturing.
- *
- * First argument can be a Playwright Page (extracts URL for target matching)
- * or a string URL to match against.
- *
- * Options:
- * - fullPage: capture the entire scrollable page (default: viewport only)
- * - format: "png" (default) or "jpeg"
- * - quality: 0-100, only for jpeg (default: 80)
- * - serverUrl: relay server URL (default: http://localhost:9222)
+ * Automatically retries once if the page object is stale (e.g. after a
+ * redirect destroyed the original CDP target). On stale-page errors, grabs
+ * the last page from the browser context and retries.
  */
 export async function cdpScreenshot(
-  pageOrUrl: Page | string,
+  page: Page,
   path?: string,
-  options?: { fullPage?: boolean; format?: "png" | "jpeg"; quality?: number; serverUrl?: string }
+  options?: { fullPage?: boolean }
 ): Promise<Buffer> {
-  const format = options?.format ?? "png";
-  const serverUrl = options?.serverUrl ?? "http://localhost:9222";
-  const matchUrl = typeof pageOrUrl === "string" ? pageOrUrl : pageOrUrl.url();
-
-  // Use a SEPARATE raw WebSocket that doesn't go through Playwright.
-  // Playwright's connectOverCDP enables setFocusEmulationEnabled which causes the deadlock.
-  const wsUrl = serverUrl.replace("http://", "ws://") + "/cdp/screenshot-" + Date.now();
-  const ws = new WebSocket(wsUrl);
-  await new Promise<void>((resolve, reject) => {
-    ws.addEventListener("open", () => resolve());
-    ws.addEventListener("error", () => reject(new Error("WebSocket connection failed")));
-  });
-
-  let msgId = 0;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  function send(method: string, params: Record<string, unknown> = {}, sessionId?: string): Promise<any> {
-    const id = ++msgId;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const msg: any = { id, method, params };
-    if (sessionId) msg.sessionId = sessionId;
-    ws.send(JSON.stringify(msg));
-    return new Promise((resolve, reject) => {
-      const timeout = setTimeout(() => reject(new Error(`Screenshot CDP timeout: ${method}`)), 60000);
-      const handler = (event: MessageEvent) => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        let data: any;
-        try { data = JSON.parse(String(event.data)); } catch { return; }
-        if (data.id === id) {
-          ws.removeEventListener("message", handler);
-          clearTimeout(timeout);
-          if (data.error) reject(new Error(data.error.message || JSON.stringify(data.error)));
-          else resolve(data.result);
+  async function attemptScreenshot(targetPage: Page): Promise<Buffer> {
+    const cdpSession = await targetPage.context().newCDPSession(targetPage);
+    try {
+      if (options?.fullPage) {
+        const metrics = (await cdpSession.send("Page.getLayoutMetrics")) as {
+          cssContentSize?: { width: number; height: number };
+          contentSize?: { width: number; height: number };
+        };
+        const size = metrics.cssContentSize || metrics.contentSize;
+        if (size) {
+          await cdpSession.send("Emulation.setDeviceMetricsOverride", {
+            width: Math.ceil(size.width),
+            height: Math.ceil(size.height),
+            deviceScaleFactor: 1,
+            mobile: false,
+          });
         }
-      };
-      ws.addEventListener("message", handler);
-    });
+      }
+
+      const result = (await cdpSession.send("Page.captureScreenshot", {
+        format: "png",
+        ...(options?.fullPage ? { captureBeyondViewport: true } : {}),
+      })) as { data: string };
+
+      if (options?.fullPage) {
+        await cdpSession.send("Emulation.clearDeviceMetricsOverride").catch(() => {});
+      }
+
+      const buffer = Buffer.from(result.data, "base64");
+      if (path) writeFileSync(path, buffer);
+      return buffer;
+    } finally {
+      await cdpSession.detach().catch(() => {});
+    }
   }
 
   try {
-    // Find target matching the page URL
-    const { targetInfos } = await send("Target.getTargets");
-    type TI = { type: string; targetId: string; url: string };
-    let target = (targetInfos as TI[]).find((t) => t.type === "page" && t.url === matchUrl);
-    if (!target) {
-      target = (targetInfos as TI[]).find((t) => t.type === "page");
-    }
-    if (!target) {
-      throw new Error("No page target found for screenshot");
-    }
+    return await attemptScreenshot(page);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    const isStalePage =
+      message.includes("no object with guid") ||
+      message.includes("Target closed") ||
+      message.includes("Session closed") ||
+      message.includes("Target page, context or browser has been closed");
 
-    const { sessionId } = await send("Target.attachToTarget", {
-      targetId: target.targetId,
-      flatten: true,
-    });
-
-    // KEY FIX: disable focus emulation to prevent Chromium deadlock (#377715191)
-    await send("Emulation.setFocusEmulationEnabled", { enabled: false }, sessionId).catch(() => {});
-
-    if (options?.fullPage) {
-      const metrics = await send("Page.getLayoutMetrics", {}, sessionId);
-      const size = metrics.cssContentSize || metrics.contentSize;
-      if (size) {
-        await send("Emulation.setDeviceMetricsOverride", {
-          width: Math.ceil(size.width),
-          height: Math.ceil(size.height),
-          deviceScaleFactor: 1,
-          mobile: false,
-        }, sessionId);
-      }
+    if (!isStalePage) {
+      throw error;
     }
 
-    const result = await send("Page.captureScreenshot", {
-      format,
-      ...(format === "jpeg" ? { quality: options?.quality ?? 80 } : {}),
-      ...(options?.fullPage ? { captureBeyondViewport: true } : {}),
-    }, sessionId);
-
-    if (options?.fullPage) {
-      await send("Emulation.clearDeviceMetricsOverride", {}, sessionId).catch(() => {});
+    // Page is stale — try to grab the most recent page from the context
+    console.log(`[cdpScreenshot] Page stale, retrying with latest page...`);
+    const allPages = page.context().pages();
+    const freshPage = allPages[allPages.length - 1];
+    if (!freshPage || freshPage === page) {
+      throw error;
     }
 
-    const buffer = Buffer.from(result.data, "base64");
-    if (path) writeFileSync(path, buffer);
-    return buffer;
-  } finally {
-    ws.close();
+    return await attemptScreenshot(freshPage);
   }
 }
 
@@ -240,10 +204,10 @@ export async function getIframeContent(
   const cdp = await connectRawCDP(serverUrl);
   try {
     const targets = await cdp.send("Target.getTargets");
-    const matches = (targets.targetInfos as Array<{ type: string; targetId: string; url: string; title: string }>)
-      .filter((t) => t.type === "iframe" && t.url.includes(urlPattern));
+    const iframe = (targets.targetInfos as Array<{ type: string; targetId: string; url: string; title: string }>)
+      .find((t) => t.type === "iframe" && t.url.includes(urlPattern));
 
-    if (matches.length === 0) {
+    if (!iframe) {
       const available = (targets.targetInfos as Array<{ type: string; url: string }>)
         .filter((t) => t.type === "iframe")
         .map((t) => t.url);
@@ -251,10 +215,6 @@ export async function getIframeContent(
         `No iframe matching "${urlPattern}". Available iframes:\n${available.map((u) => `  - ${u}`).join("\n") || "  (none)"}`
       );
     }
-
-    // Use the last match — when pages reload, stale iframes linger and
-    // the freshest (working) one is appended last by the extension.
-    const iframe = matches[matches.length - 1];
 
     const { sessionId } = await cdp.send("Target.attachToTarget", {
       targetId: iframe.targetId,
@@ -293,15 +253,12 @@ export async function evaluateInIframe(
   const cdp = await connectRawCDP(serverUrl);
   try {
     const targets = await cdp.send("Target.getTargets");
-    const matches = (targets.targetInfos as Array<{ type: string; targetId: string; url: string }>)
-      .filter((t) => t.type === "iframe" && t.url.includes(urlPattern));
+    const iframe = (targets.targetInfos as Array<{ type: string; targetId: string; url: string }>)
+      .find((t) => t.type === "iframe" && t.url.includes(urlPattern));
 
-    if (matches.length === 0) {
+    if (!iframe) {
       throw new Error(`No iframe matching "${urlPattern}"`);
     }
-
-    // Use the last match — freshest iframe when stale ones linger after reload
-    const iframe = matches[matches.length - 1];
 
     const { sessionId } = await cdp.send("Target.attachToTarget", {
       targetId: iframe.targetId,
@@ -327,7 +284,33 @@ export async function evaluateInIframe(
 }
 
 /**
- * Note: Page.captureScreenshot only works on top-level targets.
- * To screenshot an iframe's content, use cdpScreenshot(page) on the parent page.
- * The iframe is rendered within the page, so it will be visible in the screenshot.
+ * Take a screenshot of a cross-origin iframe's content.
  */
+export async function screenshotIframe(
+  urlPattern: string,
+  path: string,
+  serverUrl = "http://localhost:9222"
+): Promise<Buffer> {
+  const cdp = await connectRawCDP(serverUrl);
+  try {
+    const targets = await cdp.send("Target.getTargets");
+    const iframe = (targets.targetInfos as Array<{ type: string; targetId: string; url: string }>)
+      .find((t) => t.type === "iframe" && t.url.includes(urlPattern));
+
+    if (!iframe) {
+      throw new Error(`No iframe matching "${urlPattern}"`);
+    }
+
+    const { sessionId } = await cdp.send("Target.attachToTarget", {
+      targetId: iframe.targetId,
+      flatten: true,
+    });
+
+    const result = await cdp.send("Page.captureScreenshot", { format: "png" }, sessionId);
+    const buffer = Buffer.from(result.data, "base64");
+    writeFileSync(path, buffer);
+    return buffer;
+  } finally {
+    cdp.close();
+  }
+}

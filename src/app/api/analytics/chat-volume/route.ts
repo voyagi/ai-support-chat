@@ -1,13 +1,7 @@
+import { withAdminAuth } from "@/lib/admin-auth";
 import { getChatVolume } from "@/lib/analytics/chat-volume";
-import { getSession } from "@/lib/auth/session";
 
-export async function GET(req: Request) {
-	// Verify admin authentication
-	const session = await getSession();
-	if (!session.isAuthenticated) {
-		return Response.json({ error: "Unauthorized" }, { status: 401 });
-	}
-
+export const GET = withAdminAuth(async (req: Request) => {
 	const url = new URL(req.url);
 	const period = url.searchParams.get("period") === "week" ? "week" : "day";
 	const daysParam = url.searchParams.get("days");
@@ -23,4 +17,4 @@ export async function GET(req: Request) {
 			{ status: 500 },
 		);
 	}
-}
+});

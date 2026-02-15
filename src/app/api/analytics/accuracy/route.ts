@@ -1,13 +1,7 @@
+import { withAdminAuth } from "@/lib/admin-auth";
 import { getAccuracyMetrics } from "@/lib/analytics/accuracy";
-import { getSession } from "@/lib/auth/session";
 
-export async function GET() {
-	// Verify admin authentication
-	const session = await getSession();
-	if (!session.isAuthenticated) {
-		return Response.json({ error: "Unauthorized" }, { status: 401 });
-	}
-
+export const GET = withAdminAuth(async () => {
 	try {
 		const data = await getAccuracyMetrics();
 		return Response.json(data);
@@ -18,4 +12,4 @@ export async function GET() {
 			{ status: 500 },
 		);
 	}
-}
+});

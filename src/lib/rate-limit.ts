@@ -1,9 +1,7 @@
 import { Ratelimit } from "@upstash/ratelimit";
-import { Redis } from "@upstash/redis";
-import type { NextRequest } from "next/server";
+import { getRedis } from "@/lib/redis";
 
-// Shared Redis client for edge caching
-const redis = Redis.fromEnv();
+const redis = getRedis();
 
 // Two rate limiter singletons created OUTSIDE handlers for edge caching
 export const hourlyLimit = new Ratelimit({
@@ -50,19 +48,4 @@ export async function checkRateLimit(
 	};
 }
 
-export function getIpAddress(request: NextRequest): string {
-	// Try request.ip first (Vercel provides this at runtime)
-	const ip = (request as unknown as { ip?: string }).ip;
-	if (ip) {
-		return ip;
-	}
-
-	// Fallback to x-forwarded-for header (first IP in comma-separated list)
-	const forwardedFor = request.headers.get("x-forwarded-for");
-	if (forwardedFor) {
-		return forwardedFor.split(",")[0].trim();
-	}
-
-	// Last resort fallback
-	return "127.0.0.1";
-}
+export { getClientIp as getIpAddress } from "@/lib/request-utils";

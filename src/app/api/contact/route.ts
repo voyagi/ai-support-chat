@@ -9,8 +9,11 @@ interface ContactSubmissionBody {
 
 /**
  * POST /api/contact
- * Submit a contact form when bot lacks a confident answer
- * This endpoint is public (no auth) — called from the chat UI
+ * Submit a contact form when bot lacks a confident answer.
+ * This endpoint is public (no auth), called from the chat UI and widget.
+ * No CSRF protection: the widget runs on external sites via iframe,
+ * so origin checks would break it. Rate limiting in middleware is the
+ * primary abuse defense.
  */
 export async function POST(req: Request) {
 	try {

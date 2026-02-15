@@ -4,6 +4,8 @@ import { Chat, useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { Bot, RefreshCw } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useRateLimit } from "@/hooks/useRateLimit";
+import { extractMessageText } from "@/lib/chat/message-utils";
 import { cn } from "@/lib/cn";
 import { ThemeToggle } from "../ui/ThemeToggle";
 import { ChatInput } from "./ChatInput";
@@ -26,16 +28,6 @@ interface ChatWindowProps {
 	widget?: boolean;
 }
 
-// Helper to extract text content from UIMessage parts
-function getMessageText(message: {
-	parts: Array<{ type: string; text?: string }>;
-}): string {
-	return message.parts
-		.filter((part) => part.type === "text")
-		.map((part) => part.text)
-		.join("");
-}
-
 export function ChatWindow({ widget = false }: ChatWindowProps) {
 	const conversationIdRef = useRef<string | null>(null);
 	const pendingContactRef = useRef<ContactFormData | null>(null);
@@ -46,16 +38,19 @@ export function ChatWindow({ widget = false }: ChatWindowProps) {
 	const bottomRef = useRef<HTMLDivElement>(null);
 	const [isAtBottom, setIsAtBottom] = useState(true);
 
-	// Rate limit state
-	const [rateLimitRemaining, setRateLimitRemaining] = useState<number | null>(
-		null,
-	);
-	const [rateLimitReset, setRateLimitReset] = useState<string | null>(null);
-	const [rateLimitHit, setRateLimitHit] = useState(false);
-	const [budgetExceeded, setBudgetExceeded] = useState(false);
-	const [countdown, setCountdown] = useState<number>(0);
+	const {
+		rateLimitWarning,
+		rateLimitMessage,
+		rateLimitHit,
+		budgetExceeded,
+		setRateLimitRemaining,
+		setRateLimitReset,
+		setRateLimitHit,
+		setBudgetExceeded,
+	} = useRateLimit();
 
-	// Create chat instance with DefaultChatTransport (stable — no state deps)
+	// Create chat instance with DefaultChatTransport (stable, no state deps)
+	// biome-ignore lint/correctness/useExhaustiveDependencies: useState setters are referentially stable
 	const chat = useMemo(
 		() =>
 			new Chat({
@@ -204,56 +199,12 @@ export function ChatWindow({ widget = false }: ChatWindowProps) {
 		}
 	}, [messages, isStreaming]);
 
-	// Countdown timer for rate limit reset
-	useEffect(() => {
-		if (!rateLimitHit || !rateLimitReset) {
-			return;
-		}
-
-		const updateCountdown = () => {
-			const resetTime = new Date(rateLimitReset).getTime();
-			const now = Date.now();
-			const secondsRemaining = Math.max(0, Math.ceil((resetTime - now) / 1000));
-			setCountdown(secondsRemaining);
-
-			if (secondsRemaining === 0) {
-				setRateLimitHit(false);
-			}
-		};
-
-		updateCountdown();
-		const interval = setInterval(updateCountdown, 1000);
-
-		return () => clearInterval(interval);
-	}, [rateLimitHit, rateLimitReset]);
-
 	const handleSendMessage = (message: string) => {
-		sendMessage({
-			text: message,
-		});
+		sendMessage({ text: message });
 	};
 
 	const showTypingIndicator = isStreaming && messages.length > 0;
-	const messageCount = messages.length;
-	const showMessageLimitWarning = messageCount >= 30;
-
-	// Compute rate limit warning and message
-	const rateLimitWarning =
-		rateLimitRemaining !== null && rateLimitRemaining <= 4
-			? `You have ${rateLimitRemaining} messages left`
-			: undefined;
-
-	const rateLimitMessage = rateLimitHit
-		? (() => {
-				const minutes = Math.floor(countdown / 60);
-				const seconds = countdown % 60;
-				const timeString =
-					minutes > 0
-						? `${minutes} minute${minutes > 1 ? "s" : ""}`
-						: `${seconds} second${seconds !== 1 ? "s" : ""}`;
-				return `You've reached the demo limit. Try again in ${timeString}. Want this for your business? Get in touch.`;
-			})()
-		: undefined;
+	const showMessageLimitWarning = messages.length >= 30;
 
 	return (
 		<div className={cn("flex flex-col", widget ? "h-full" : "h-screen")}>
@@ -312,7 +263,7 @@ export function ChatWindow({ widget = false }: ChatWindowProps) {
 							<MessageBubble
 								key={msg.id}
 								role={msg.role as "user" | "assistant"}
-								content={getMessageText(msg)}
+								content={extractMessageText(msg)}
 								sources={
 									msg.role === "assistant" ? sourcesMap[msg.id] : undefined
 								}

@@ -1,4 +1,5 @@
 import { generateEmbedding } from "@/lib/embeddings/embeddings";
+import { getErrorMessage } from "@/lib/errors";
 import { createServiceRoleClient } from "@/lib/supabase/server";
 
 export interface SimilarChunk {
@@ -37,7 +38,7 @@ export async function searchSimilarChunks(
 		queryEmbedding = await generateEmbedding(query);
 	} catch (error) {
 		throw new Error(
-			`Failed to generate embedding for query: ${error instanceof Error ? error.message : String(error)}`,
+			`Failed to generate embedding for query: ${getErrorMessage(error)}`,
 		);
 	}
 
@@ -51,9 +52,10 @@ export async function searchSimilarChunks(
 		match_count: count,
 	};
 
-	// Add tenant_id if provided (enables multi-tenant RAG search)
+	// Add p_tenant_id if provided (enables multi-tenant RAG search)
+	// Prefixed to avoid PostgreSQL column/parameter name collision
 	if (options?.tenantId) {
-		rpcParams.tenant_id = options.tenantId;
+		rpcParams.p_tenant_id = options.tenantId;
 	}
 
 	const { data, error } = await supabase.rpc(

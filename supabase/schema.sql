@@ -41,6 +41,10 @@ create index if not exists document_chunks_embedding_idx
   on document_chunks
   using hnsw (embedding vector_ip_ops);
 
+-- Indexes for tenant filtering (sandbox isolation)
+create index if not exists documents_tenant_id_idx on documents(tenant_id);
+create index if not exists document_chunks_tenant_id_idx on document_chunks(tenant_id);
+
 -- Conversations table: stores chat sessions
 create table if not exists conversations (
   id uuid primary key default gen_random_uuid(),
@@ -63,7 +67,7 @@ create or replace function match_document_chunks(
   query_embedding vector(1536),
   match_threshold float,
   match_count int,
-  tenant_id text default null
+  p_tenant_id text default null
 )
 returns table (
   id uuid,
@@ -90,8 +94,8 @@ as $$
   where
     1 - (dc.embedding <#> query_embedding) > match_threshold
     and (
-      (tenant_id is null and dc.tenant_id is null)
-      or (tenant_id is not null and (dc.tenant_id is null or dc.tenant_id = tenant_id))
+      (p_tenant_id is null and dc.tenant_id is null)
+      or (p_tenant_id is not null and (dc.tenant_id is null or dc.tenant_id = p_tenant_id))
     )
   order by dc.embedding <#> query_embedding
   limit match_count;

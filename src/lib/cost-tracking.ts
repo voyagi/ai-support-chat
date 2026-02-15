@@ -1,7 +1,6 @@
-import { Redis } from "@upstash/redis";
+import { getRedis } from "@/lib/redis";
 
-// Create Redis client for cost tracking
-const redis = Redis.fromEnv();
+const redis = getRedis();
 
 // OpenAI pricing for gpt-4.1-mini (per 1M tokens)
 const PRICING = {
