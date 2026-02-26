@@ -224,9 +224,7 @@ function subdivideSection(
 				currentTokens = 0;
 			}
 
-			chunks.push(
-				...splitBySentences(heading, para, documentTitle, options),
-			);
+			chunks.push(...splitBySentences(heading, para, documentTitle, options));
 		} else if (
 			currentTokens + paraTokens > options.targetTokens &&
 			currentChunk.length > 0
