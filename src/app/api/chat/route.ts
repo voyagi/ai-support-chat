@@ -128,8 +128,7 @@ function handleHighConfidence(
 		maxOutputTokens: 300,
 		temperature: 0.7,
 		onFinish: async ({ text }) => {
-			const answeredFromKb =
-				chunks.length > 0 && chunks[0].similarity > 0.7;
+			const answeredFromKb = chunks.length > 0 && chunks[0].similarity > 0.7;
 
 			saveMessages(conversationId, userMessage, text, answeredFromKb).catch(
 				(err) => {
@@ -248,8 +247,7 @@ export async function POST(req: Request) {
 
 		// pgvector scores exceed 1.0 because embeddings aren't L2-normalized.
 		// Observed: unrelated queries ~1.10, in-KB queries ~1.80+
-		const hasConfidentAnswer =
-			chunks.length > 0 && chunks[0].similarity > 1.15;
+		const hasConfidentAnswer = chunks.length > 0 && chunks[0].similarity > 1.15;
 
 		if (!hasConfidentAnswer) {
 			return handleLowConfidence(conversationId, userMessage);
