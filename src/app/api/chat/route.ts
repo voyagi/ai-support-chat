@@ -247,7 +247,21 @@ export async function POST(req: Request) {
 
 		// pgvector scores exceed 1.0 because embeddings aren't L2-normalized.
 		// Observed: unrelated queries ~1.10, in-KB queries ~1.80+
-		const hasConfidentAnswer = chunks.length > 0 && chunks[0].similarity > 1.15;
+		const CONFIDENCE_THRESHOLD = 1.15;
+		const bestScore = chunks.length > 0 ? chunks[0].similarity : 0;
+
+		if (bestScore > 0) {
+			console.log(
+				`[chat] RAG top score: ${bestScore.toFixed(3)} (threshold: ${CONFIDENCE_THRESHOLD})`,
+			);
+		}
+		if (bestScore > CONFIDENCE_THRESHOLD && bestScore <= 1.3) {
+			console.warn(
+				`[chat] Borderline RAG score ${bestScore.toFixed(3)} in zone ${CONFIDENCE_THRESHOLD}-1.30, may need threshold recalibration`,
+			);
+		}
+
+		const hasConfidentAnswer = bestScore > CONFIDENCE_THRESHOLD;
 
 		if (!hasConfidentAnswer) {
 			return handleLowConfidence(conversationId, userMessage);
