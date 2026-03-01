@@ -3,8 +3,8 @@ import { checkRateLimit, getIpAddress } from "@/lib/rate-limit";
 
 /**
  * Middleware handles two concerns:
- * 1. Optimistic redirect for unauthenticated /admin/* requests
- * 2. Rate limiting for /api/chat requests
+ * 1. Rate limiting for public API endpoints (/api/chat, /api/contact, /api/sandbox/upload)
+ * 2. Optimistic redirect for unauthenticated /admin/* requests
  *
  * IMPORTANT: Admin auth check is NOT the sole auth gate. Every Server Component
  * and Server Action that accesses admin data must also call getSession() and
@@ -14,8 +14,12 @@ import { checkRateLimit, getIpAddress } from "@/lib/rate-limit";
 export async function middleware(request: NextRequest) {
 	const { pathname } = request.nextUrl;
 
-	// Rate limiting for chat API (applies to both full-page and widget iframe)
-	if (pathname === "/api/chat") {
+	// Rate limiting for public API endpoints
+	if (
+		pathname === "/api/chat" ||
+		pathname === "/api/contact" ||
+		pathname === "/api/sandbox/upload"
+	) {
 		const ip = getIpAddress(request);
 		const rateLimitResult = await checkRateLimit(ip);
 
@@ -33,7 +37,6 @@ export async function middleware(request: NextRequest) {
 			);
 		}
 
-		// Add rate limit headers to response
 		const response = NextResponse.next();
 		response.headers.set("X-RateLimit-Limit", rateLimitResult.limit.toString());
 		response.headers.set(
@@ -47,7 +50,7 @@ export async function middleware(request: NextRequest) {
 		return response;
 	}
 
-	// Admin auth redirect logic
+	// Admin auth redirect logic (only for /admin/* routes below this point)
 	// Skip login page itself to avoid redirect loop
 	if (pathname === "/admin/login") {
 		return NextResponse.next();
@@ -64,5 +67,10 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-	matcher: ["/admin/:path*", "/api/chat"],
+	matcher: [
+		"/admin/:path*",
+		"/api/chat",
+		"/api/contact",
+		"/api/sandbox/upload",
+	],
 };
