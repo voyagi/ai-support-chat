@@ -63,6 +63,9 @@ export async function trackChatCost(
 	}
 }
 
+// Soft budget check: concurrent requests can slightly exceed the budget
+// due to the check-then-allow gap. An atomic Lua script would fix this
+// but is over-engineering for a demo with a $10 daily cap.
 export async function checkBudgetRemaining(): Promise<BudgetStatus> {
 	const current = await getCurrentCost();
 	const percentUsed = (current / DAILY_BUDGET) * 100;
