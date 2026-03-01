@@ -30,5 +30,9 @@ export async function createServerSupabaseClient() {
 }
 
 export function createServiceRoleClient() {
-	return createClient(supabaseUrl, process.env.SUPABASE_SECRET_KEY ?? "");
+	const secretKey = process.env.SUPABASE_SECRET_KEY;
+	if (!secretKey) {
+		throw new Error("SUPABASE_SECRET_KEY is not set");
+	}
+	return createClient(supabaseUrl, secretKey);
 }
