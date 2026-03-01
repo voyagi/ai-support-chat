@@ -63,14 +63,12 @@ function handleLowConfidence(conversationId: string, userMessage: string) {
 		},
 	});
 
-	saveMessages(conversationId, userMessage, noAnswerText, false).catch(
-		(e) => {
-			console.error("[chat] saveMessages failed", {
-				conversationId,
-				error: e instanceof Error ? e.message : e,
-			});
-		},
-	);
+	saveMessages(conversationId, userMessage, noAnswerText, false).catch((e) => {
+		console.error("[chat] saveMessages failed", {
+			conversationId,
+			error: e instanceof Error ? e.message : e,
+		});
+	});
 
 	return createUIMessageStreamResponse({
 		stream,
