@@ -1,7 +1,5 @@
 import { getRedis } from "@/lib/redis";
 
-const redis = getRedis();
-
 // OpenAI pricing for gpt-4.1-mini (per 1M tokens)
 const PRICING = {
 	input: 0.15, // $0.15 per 1M input tokens
@@ -38,7 +36,7 @@ function getTodayKey(): string {
 
 export async function getCurrentCost(): Promise<number> {
 	const key = getTodayKey();
-	const cost = await redis.get<number>(key);
+	const cost = await getRedis().get<number>(key);
 	return cost ?? 0;
 }
 
@@ -51,6 +49,8 @@ export async function trackChatCost(
 	const totalCost = inputCost + outputCost;
 
 	const key = getTodayKey();
+
+	const redis = getRedis();
 
 	// Atomically increment the cost for today
 	await redis.incrbyfloat(key, totalCost);

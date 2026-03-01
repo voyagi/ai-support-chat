@@ -1,8 +1,6 @@
 import { Resend } from "resend";
 import { getRedis } from "@/lib/redis";
 
-const redis = getRedis();
-
 function getResendClient(): Resend | null {
 	const apiKey = process.env.RESEND_API_KEY;
 	if (!apiKey) {
@@ -23,7 +21,7 @@ export async function shouldSendAlert(
 	level: "warning" | "critical",
 ): Promise<boolean> {
 	const key = getAlertKeyForToday(level);
-	const alreadySent = await redis.get(key);
+	const alreadySent = await getRedis().get(key);
 	return alreadySent === null;
 }
 
@@ -81,7 +79,7 @@ This is an automated alert from the cost tracking system.
 
 		// Mark this alert as sent for today
 		const key = getAlertKeyForToday(level);
-		await redis.set(key, "1", { ex: 86400 }); // 1 day TTL
+		await getRedis().set(key, "1", { ex: 86400 }); // 1 day TTL
 	} catch (error) {
 		// Never throw - this is fire-and-forget
 		console.error("Failed to send cost alert email:", error);
