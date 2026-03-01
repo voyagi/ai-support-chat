@@ -64,8 +64,11 @@ function handleLowConfidence(conversationId: string, userMessage: string) {
 	});
 
 	saveMessages(conversationId, userMessage, noAnswerText, false).catch(
-		(err) => {
-			console.error("Failed to persist conversation:", err);
+		(e) => {
+			console.error("[chat] saveMessages failed", {
+				conversationId,
+				error: e instanceof Error ? e.message : e,
+			});
 		},
 	);
 
@@ -131,8 +134,11 @@ function handleHighConfidence(
 			const answeredFromKb = chunks.length > 0 && chunks[0].similarity > 0.7;
 
 			saveMessages(conversationId, userMessage, text, answeredFromKb).catch(
-				(err) => {
-					console.error("Failed to persist conversation:", err);
+				(e) => {
+					console.error("[chat] saveMessages failed", {
+						conversationId,
+						error: e instanceof Error ? e.message : e,
+					});
 				},
 			);
 
