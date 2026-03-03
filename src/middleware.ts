@@ -1,5 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { checkRateLimit, getIpAddress } from "@/lib/rate-limit";
+import {
+	checkLoginRateLimit,
+	checkRateLimit,
+	getIpAddress,
+} from "@/lib/rate-limit";
 
 /**
  * Middleware handles two concerns:
@@ -21,33 +25,63 @@ export async function middleware(request: NextRequest) {
 		pathname === "/api/sandbox/upload"
 	) {
 		const ip = getIpAddress(request);
-		const rateLimitResult = await checkRateLimit(ip);
 
-		if (!rateLimitResult.success) {
-			return NextResponse.json(
-				{
-					error: "Rate limit exceeded",
-					remaining: 0,
-					reset: new Date(rateLimitResult.reset).toISOString(),
-					retryAfterSeconds: Math.ceil(
-						(rateLimitResult.reset - Date.now()) / 1000,
-					),
-				},
-				{ status: 429 },
+		try {
+			const rateLimitResult = await checkRateLimit(ip);
+
+			if (!rateLimitResult.success) {
+				return NextResponse.json(
+					{
+						error: "Rate limit exceeded",
+						remaining: 0,
+						reset: new Date(rateLimitResult.reset).toISOString(),
+						retryAfterSeconds: Math.ceil(
+							(rateLimitResult.reset - Date.now()) / 1000,
+						),
+					},
+					{ status: 429 },
+				);
+			}
+
+			const response = NextResponse.next();
+			response.headers.set(
+				"X-RateLimit-Limit",
+				rateLimitResult.limit.toString(),
 			);
+			response.headers.set(
+				"X-RateLimit-Remaining",
+				rateLimitResult.remaining.toString(),
+			);
+			response.headers.set(
+				"X-RateLimit-Reset",
+				new Date(rateLimitResult.reset).toISOString(),
+			);
+			return response;
+		} catch (error) {
+			// Fail-open: allow request through if Redis is unavailable
+			console.error(
+				"[middleware] Rate limit check failed, allowing request:",
+				error,
+			);
+			return NextResponse.next();
 		}
+	}
 
-		const response = NextResponse.next();
-		response.headers.set("X-RateLimit-Limit", rateLimitResult.limit.toString());
-		response.headers.set(
-			"X-RateLimit-Remaining",
-			rateLimitResult.remaining.toString(),
-		);
-		response.headers.set(
-			"X-RateLimit-Reset",
-			new Date(rateLimitResult.reset).toISOString(),
-		);
-		return response;
+	// Rate limiting for login (stricter: 5 attempts per 15 min)
+	if (pathname === "/admin/login" && request.method === "POST") {
+		const ip = getIpAddress(request);
+		try {
+			const rateLimitResult = await checkLoginRateLimit(ip);
+			if (!rateLimitResult.success) {
+				return NextResponse.json(
+					{ error: "Too many login attempts. Please try again later." },
+					{ status: 429 },
+				);
+			}
+		} catch {
+			// Fail-open on Redis failure
+		}
+		return NextResponse.next();
 	}
 
 	// Admin auth redirect logic (only for /admin/* routes below this point)
