@@ -2,20 +2,23 @@ import { type CookieOptions, createServerClient } from "@supabase/ssr";
 import { createClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-if (!supabaseUrl) {
-	throw new Error("NEXT_PUBLIC_SUPABASE_URL is required");
-}
-
-const supabasePublishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
-if (!supabasePublishableKey) {
-	throw new Error("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY is required");
+function getSupabaseConfig() {
+	const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+	if (!url) {
+		throw new Error("NEXT_PUBLIC_SUPABASE_URL is required");
+	}
+	const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+	if (!key) {
+		throw new Error("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY is required");
+	}
+	return { url, key };
 }
 
 export async function createServerSupabaseClient() {
+	const { url, key } = getSupabaseConfig();
 	const cookieStore = await cookies();
 
-	return createServerClient(supabaseUrl, supabasePublishableKey, {
+	return createServerClient(url, key, {
 		cookies: {
 			getAll() {
 				return cookieStore.getAll();
@@ -40,5 +43,6 @@ export function createServiceRoleClient() {
 	if (!secretKey) {
 		throw new Error("SUPABASE_SECRET_KEY is not set");
 	}
-	return createClient(supabaseUrl, secretKey);
+	const { url } = getSupabaseConfig();
+	return createClient(url, secretKey);
 }

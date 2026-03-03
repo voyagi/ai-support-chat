@@ -267,15 +267,26 @@ describe("createServiceRoleClient - configuration validation", () => {
 	it("throws when NEXT_PUBLIC_SUPABASE_URL is missing", async () => {
 		vi.resetModules();
 		const originalUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+		const originalPubKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+		const originalSecret = process.env.SUPABASE_SECRET_KEY;
 		delete process.env.NEXT_PUBLIC_SUPABASE_URL;
+		process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY = "test-key";
+		process.env.SUPABASE_SECRET_KEY = "test-secret";
 
 		try {
-			await expect(import("@/lib/supabase/server")).rejects.toThrow(
+			const { createServiceRoleClient } = await import(
+				"@/lib/supabase/server"
+			);
+			expect(() => createServiceRoleClient()).toThrow(
 				"NEXT_PUBLIC_SUPABASE_URL is required",
 			);
 		} finally {
 			if (originalUrl) process.env.NEXT_PUBLIC_SUPABASE_URL = originalUrl;
 			else delete process.env.NEXT_PUBLIC_SUPABASE_URL;
+			if (originalPubKey) process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY = originalPubKey;
+			else delete process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+			if (originalSecret) process.env.SUPABASE_SECRET_KEY = originalSecret;
+			else delete process.env.SUPABASE_SECRET_KEY;
 		}
 	});
 });
