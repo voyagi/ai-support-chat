@@ -30,17 +30,21 @@ export async function middleware(request: NextRequest) {
 			const rateLimitResult = await checkRateLimit(ip);
 
 			if (!rateLimitResult.success) {
-				return NextResponse.json(
+				const retryAfterSeconds = Math.max(
+					0,
+					Math.ceil((rateLimitResult.reset - Date.now()) / 1000),
+				);
+				const response = NextResponse.json(
 					{
 						error: "Rate limit exceeded",
 						remaining: 0,
 						reset: new Date(rateLimitResult.reset).toISOString(),
-						retryAfterSeconds: Math.ceil(
-							(rateLimitResult.reset - Date.now()) / 1000,
-						),
+						retryAfterSeconds,
 					},
 					{ status: 429 },
 				);
+				response.headers.set("Retry-After", retryAfterSeconds.toString());
+				return response;
 			}
 
 			const response = NextResponse.next();

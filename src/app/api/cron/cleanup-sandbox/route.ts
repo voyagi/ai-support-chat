@@ -21,16 +21,14 @@ export async function GET(request: Request) {
 			);
 		}
 
-		// Verify Vercel cron header (present on genuine Vercel cron invocations)
-		const isVercelCron = request.headers.get("x-vercel-cron") === "1";
-
 		// Timing-safe comparison to prevent timing attacks on the secret
+		// Vercel sends Authorization: Bearer <CRON_SECRET> on genuine cron invocations
 		const expected = Buffer.from(`Bearer ${cronSecret}`, "utf-8");
 		const actual = Buffer.from(authHeader ?? "", "utf-8");
 		const isValidSecret =
 			expected.length === actual.length && timingSafeEqual(expected, actual);
 
-		if (!isVercelCron && !isValidSecret) {
+		if (!isValidSecret) {
 			return NextResponse.json(
 				{ success: false, error: "Unauthorized" },
 				{ status: 401 },
