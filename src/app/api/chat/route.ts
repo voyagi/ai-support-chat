@@ -217,7 +217,27 @@ export async function POST(req: Request) {
 			);
 		}
 
-		// 3. Check message cap
+		const MAX_MESSAGE_LENGTH = 5000;
+		if (userMessage.length > MAX_MESSAGE_LENGTH) {
+			return Response.json(
+				{
+					error: `Message too long. Maximum ${MAX_MESSAGE_LENGTH} characters.`,
+				},
+				{ status: 400 },
+			);
+		}
+
+		// 3. Validate conversationId format
+		const UUID_RE =
+			/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+		if (incomingConversationId && !UUID_RE.test(incomingConversationId)) {
+			return Response.json(
+				{ error: "Invalid conversation ID format" },
+				{ status: 400 },
+			);
+		}
+
+		// 4. Check message cap
 		if (incomingConversationId) {
 			const messageCount = await getMessageCount(incomingConversationId);
 			if (messageCount >= MAX_MESSAGES_PER_CONVERSATION) {
@@ -231,18 +251,18 @@ export async function POST(req: Request) {
 			}
 		}
 
-		// 4. Create conversation if needed
+		// 5. Create conversation if needed
 		const conversationId =
 			incomingConversationId || (await createConversation());
 
-		// 5. Get tenant ID if sandbox mode is enabled
+		// 6. Get tenant ID if sandbox mode is enabled
 		let tenantId: string | undefined;
 		if (process.env.NEXT_PUBLIC_SANDBOX_ENABLED === "true") {
 			const ip = getClientIp(req);
 			tenantId = getTenantIdFromIp(ip);
 		}
 
-		// 6. RAG retrieval
+		// 7. RAG retrieval
 		const chunks = await searchSimilarChunks(userMessage, {
 			threshold: 0.7,
 			count: 5,
