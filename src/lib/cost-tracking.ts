@@ -1,7 +1,5 @@
 import { getRedis } from "@/lib/redis";
 
-const redis = getRedis();
-
 // OpenAI pricing for gpt-4.1-mini (per 1M tokens)
 const PRICING = {
 	input: 0.15, // $0.15 per 1M input tokens
@@ -38,7 +36,7 @@ function getTodayKey(): string {
 
 export async function getCurrentCost(): Promise<number> {
 	const key = getTodayKey();
-	const cost = await redis.get<number>(key);
+	const cost = await getRedis().get<number>(key);
 	return cost ?? 0;
 }
 
@@ -52,6 +50,8 @@ export async function trackChatCost(
 
 	const key = getTodayKey();
 
+	const redis = getRedis();
+
 	// Atomically increment the cost for today
 	await redis.incrbyfloat(key, totalCost);
 
@@ -63,6 +63,9 @@ export async function trackChatCost(
 	}
 }
 
+// Soft budget check: concurrent requests can slightly exceed the budget
+// due to the check-then-allow gap. An atomic Lua script would fix this
+// but is over-engineering for a demo with a $10 daily cap.
 export async function checkBudgetRemaining(): Promise<BudgetStatus> {
 	const current = await getCurrentCost();
 	const percentUsed = (current / DAILY_BUDGET) * 100;

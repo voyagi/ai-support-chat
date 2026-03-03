@@ -1,5 +1,6 @@
 "use server";
 
+import { timingSafeEqual } from "node:crypto";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth/session";
 
@@ -13,7 +14,10 @@ export async function login(
 		};
 	}
 
-	if (password !== process.env.ADMIN_PASSWORD) {
+	const expected = process.env.ADMIN_PASSWORD;
+	const pwBuf = Buffer.from(password);
+	const expBuf = Buffer.from(expected);
+	if (pwBuf.length !== expBuf.length || !timingSafeEqual(pwBuf, expBuf)) {
 		return { success: false, error: "Incorrect password" };
 	}
 

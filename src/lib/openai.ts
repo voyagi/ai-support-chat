@@ -4,6 +4,9 @@ let _openaiClient: OpenAI | null = null;
 
 function getClient(): OpenAI {
 	if (!_openaiClient) {
+		if (!process.env.OPENAI_API_KEY) {
+			throw new Error("OPENAI_API_KEY is required");
+		}
 		_openaiClient = new OpenAI({
 			apiKey: process.env.OPENAI_API_KEY,
 		});

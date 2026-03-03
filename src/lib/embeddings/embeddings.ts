@@ -47,22 +47,25 @@ export async function generateEmbeddings(texts: string[]): Promise<number[][]> {
 		return [];
 	}
 
+	// Clone to avoid mutating the caller's array during truncation
+	const processed = [...texts];
+
 	// Check for oversized texts
-	for (let i = 0; i < texts.length; i++) {
-		if (!isWithinTokenLimit(texts[i], MAX_INPUT_TOKENS)) {
+	for (let i = 0; i < processed.length; i++) {
+		if (!isWithinTokenLimit(processed[i], MAX_INPUT_TOKENS)) {
 			console.warn(
-				`Text at index ${i} exceeds ${MAX_INPUT_TOKENS} tokens (${countTokens(texts[i])} tokens), truncating...`,
+				`Text at index ${i} exceeds ${MAX_INPUT_TOKENS} tokens (${countTokens(processed[i])} tokens), truncating...`,
 			);
-			const ratio = MAX_INPUT_TOKENS / countTokens(texts[i]);
-			const charLimit = Math.floor(texts[i].length * ratio * 0.9);
-			texts[i] = texts[i].slice(0, charLimit);
+			const ratio = MAX_INPUT_TOKENS / countTokens(processed[i]);
+			const charLimit = Math.floor(processed[i].length * ratio * 0.9);
+			processed[i] = processed[i].slice(0, charLimit);
 		}
 	}
 
 	// Split into batches if needed
 	const batches: string[][] = [];
-	for (let i = 0; i < texts.length; i += MAX_BATCH_SIZE) {
-		batches.push(texts.slice(i, i + MAX_BATCH_SIZE));
+	for (let i = 0; i < processed.length; i += MAX_BATCH_SIZE) {
+		batches.push(processed.slice(i, i + MAX_BATCH_SIZE));
 	}
 
 	try {
@@ -86,7 +89,7 @@ export async function generateEmbeddings(texts: string[]): Promise<number[][]> {
 		return allEmbeddings;
 	} catch (error) {
 		throw new Error(
-			`Failed to generate embeddings for ${texts.length} texts: ${getErrorMessage(error)}`,
+			`Failed to generate embeddings for ${processed.length} texts: ${getErrorMessage(error)}`,
 		);
 	}
 }

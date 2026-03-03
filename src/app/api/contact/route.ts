@@ -63,6 +63,26 @@ export async function POST(req: Request) {
 			);
 		}
 
+		// Field length limits
+		if (body.name.length > 100) {
+			return Response.json(
+				{ error: "Name must be 100 characters or fewer" },
+				{ status: 400 },
+			);
+		}
+		if (body.email.length > 254) {
+			return Response.json(
+				{ error: "Email must be 254 characters or fewer" },
+				{ status: 400 },
+			);
+		}
+		if (body.question.length > 5000) {
+			return Response.json(
+				{ error: "Question must be 5000 characters or fewer" },
+				{ status: 400 },
+			);
+		}
+
 		// conversationId is optional (can be null for edge cases)
 
 		// 2. Insert into database

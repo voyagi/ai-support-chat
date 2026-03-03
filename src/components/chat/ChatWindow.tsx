@@ -204,7 +204,8 @@ export function ChatWindow({ widget = false }: ChatWindowProps) {
 	};
 
 	const showTypingIndicator = isStreaming && messages.length > 0;
-	const showMessageLimitWarning = messages.length >= 30;
+	// Warn at 80% of server's 50-message cap (see api/chat/route.ts)
+	const showMessageLimitWarning = messages.length >= 40;
 
 	return (
 		<div className={cn("flex flex-col", widget ? "h-full" : "h-screen")}>

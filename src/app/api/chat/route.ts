@@ -63,11 +63,12 @@ function handleLowConfidence(conversationId: string, userMessage: string) {
 		},
 	});
 
-	saveMessages(conversationId, userMessage, noAnswerText, false).catch(
-		(err) => {
-			console.error("Failed to persist conversation:", err);
-		},
-	);
+	saveMessages(conversationId, userMessage, noAnswerText, false).catch((e) => {
+		console.error("[chat] saveMessages failed", {
+			conversationId,
+			error: e instanceof Error ? e.message : e,
+		});
+	});
 
 	return createUIMessageStreamResponse({
 		stream,
@@ -131,8 +132,11 @@ function handleHighConfidence(
 			const answeredFromKb = chunks.length > 0 && chunks[0].similarity > 0.7;
 
 			saveMessages(conversationId, userMessage, text, answeredFromKb).catch(
-				(err) => {
-					console.error("Failed to persist conversation:", err);
+				(e) => {
+					console.error("[chat] saveMessages failed", {
+						conversationId,
+						error: e instanceof Error ? e.message : e,
+					});
 				},
 			);
 
@@ -213,7 +217,27 @@ export async function POST(req: Request) {
 			);
 		}
 
-		// 3. Check message cap
+		const MAX_MESSAGE_LENGTH = 5000;
+		if (userMessage.length > MAX_MESSAGE_LENGTH) {
+			return Response.json(
+				{
+					error: `Message too long. Maximum ${MAX_MESSAGE_LENGTH} characters.`,
+				},
+				{ status: 400 },
+			);
+		}
+
+		// 3. Validate conversationId format
+		const UUID_RE =
+			/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+		if (incomingConversationId && !UUID_RE.test(incomingConversationId)) {
+			return Response.json(
+				{ error: "Invalid conversation ID format" },
+				{ status: 400 },
+			);
+		}
+
+		// 4. Check message cap
 		if (incomingConversationId) {
 			const messageCount = await getMessageCount(incomingConversationId);
 			if (messageCount >= MAX_MESSAGES_PER_CONVERSATION) {
@@ -227,18 +251,18 @@ export async function POST(req: Request) {
 			}
 		}
 
-		// 4. Create conversation if needed
+		// 5. Create conversation if needed
 		const conversationId =
 			incomingConversationId || (await createConversation());
 
-		// 5. Get tenant ID if sandbox mode is enabled
+		// 6. Get tenant ID if sandbox mode is enabled
 		let tenantId: string | undefined;
 		if (process.env.NEXT_PUBLIC_SANDBOX_ENABLED === "true") {
 			const ip = getClientIp(req);
 			tenantId = getTenantIdFromIp(ip);
 		}
 
-		// 6. RAG retrieval
+		// 7. RAG retrieval
 		const chunks = await searchSimilarChunks(userMessage, {
 			threshold: 0.7,
 			count: 5,
@@ -247,7 +271,21 @@ export async function POST(req: Request) {
 
 		// pgvector scores exceed 1.0 because embeddings aren't L2-normalized.
 		// Observed: unrelated queries ~1.10, in-KB queries ~1.80+
-		const hasConfidentAnswer = chunks.length > 0 && chunks[0].similarity > 1.15;
+		const CONFIDENCE_THRESHOLD = 1.15;
+		const bestScore = chunks.length > 0 ? chunks[0].similarity : 0;
+
+		if (bestScore > 0) {
+			console.log(
+				`[chat] RAG top score: ${bestScore.toFixed(3)} (threshold: ${CONFIDENCE_THRESHOLD})`,
+			);
+		}
+		if (bestScore > CONFIDENCE_THRESHOLD && bestScore <= 1.3) {
+			console.warn(
+				`[chat] Borderline RAG score ${bestScore.toFixed(3)} in zone ${CONFIDENCE_THRESHOLD}-1.30, may need threshold recalibration`,
+			);
+		}
+
+		const hasConfidentAnswer = bestScore > CONFIDENCE_THRESHOLD;
 
 		if (!hasConfidentAnswer) {
 			return handleLowConfidence(conversationId, userMessage);

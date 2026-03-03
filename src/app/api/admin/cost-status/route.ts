@@ -1,10 +1,11 @@
+import { withAdminAuth } from "@/lib/admin-auth";
 import {
 	checkCostAlerts,
 	DAILY_BUDGET,
 	getCurrentCost,
 } from "@/lib/cost-tracking";
 
-export async function GET() {
+export const GET = withAdminAuth(async () => {
 	try {
 		const cost = await getCurrentCost();
 		const alert = checkCostAlerts(cost);
@@ -24,4 +25,4 @@ export async function GET() {
 			{ status: 500 },
 		);
 	}
-}
+});

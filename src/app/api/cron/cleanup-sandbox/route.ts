@@ -1,3 +1,4 @@
+import { timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 import { createServiceRoleClient } from "@/lib/supabase/server";
 
@@ -20,7 +21,14 @@ export async function GET(request: Request) {
 			);
 		}
 
-		if (authHeader !== `Bearer ${cronSecret}`) {
+		// Timing-safe comparison to prevent timing attacks on the secret
+		// Vercel sends Authorization: Bearer <CRON_SECRET> on genuine cron invocations
+		const expected = Buffer.from(`Bearer ${cronSecret}`, "utf-8");
+		const actual = Buffer.from(authHeader ?? "", "utf-8");
+		const isValidSecret =
+			expected.length === actual.length && timingSafeEqual(expected, actual);
+
+		if (!isValidSecret) {
 			return NextResponse.json(
 				{ success: false, error: "Unauthorized" },
 				{ status: 401 },

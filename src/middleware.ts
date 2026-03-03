@@ -1,10 +1,14 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { checkRateLimit, getIpAddress } from "@/lib/rate-limit";
+import {
+	checkLoginRateLimit,
+	checkRateLimit,
+	getIpAddress,
+} from "@/lib/rate-limit";
 
 /**
  * Middleware handles two concerns:
- * 1. Optimistic redirect for unauthenticated /admin/* requests
- * 2. Rate limiting for /api/chat requests
+ * 1. Rate limiting for public API endpoints (/api/chat, /api/contact, /api/sandbox/upload)
+ * 2. Optimistic redirect for unauthenticated /admin/* requests
  *
  * IMPORTANT: Admin auth check is NOT the sole auth gate. Every Server Component
  * and Server Action that accesses admin data must also call getSession() and
@@ -14,40 +18,77 @@ import { checkRateLimit, getIpAddress } from "@/lib/rate-limit";
 export async function middleware(request: NextRequest) {
 	const { pathname } = request.nextUrl;
 
-	// Rate limiting for chat API (applies to both full-page and widget iframe)
-	if (pathname === "/api/chat") {
+	// Rate limiting for public API endpoints
+	if (
+		pathname === "/api/chat" ||
+		pathname === "/api/contact" ||
+		pathname === "/api/sandbox/upload"
+	) {
 		const ip = getIpAddress(request);
-		const rateLimitResult = await checkRateLimit(ip);
 
-		if (!rateLimitResult.success) {
-			return NextResponse.json(
-				{
-					error: "Rate limit exceeded",
-					remaining: 0,
-					reset: new Date(rateLimitResult.reset).toISOString(),
-					retryAfterSeconds: Math.ceil(
-						(rateLimitResult.reset - Date.now()) / 1000,
-					),
-				},
-				{ status: 429 },
+		try {
+			const rateLimitResult = await checkRateLimit(ip);
+
+			if (!rateLimitResult.success) {
+				const retryAfterSeconds = Math.max(
+					0,
+					Math.ceil((rateLimitResult.reset - Date.now()) / 1000),
+				);
+				const response = NextResponse.json(
+					{
+						error: "Rate limit exceeded",
+						remaining: 0,
+						reset: new Date(rateLimitResult.reset).toISOString(),
+						retryAfterSeconds,
+					},
+					{ status: 429 },
+				);
+				response.headers.set("Retry-After", retryAfterSeconds.toString());
+				return response;
+			}
+
+			const response = NextResponse.next();
+			response.headers.set(
+				"X-RateLimit-Limit",
+				rateLimitResult.limit.toString(),
 			);
+			response.headers.set(
+				"X-RateLimit-Remaining",
+				rateLimitResult.remaining.toString(),
+			);
+			response.headers.set(
+				"X-RateLimit-Reset",
+				new Date(rateLimitResult.reset).toISOString(),
+			);
+			return response;
+		} catch (error) {
+			// Fail-open: allow request through if Redis is unavailable
+			console.error(
+				"[middleware] Rate limit check failed, allowing request:",
+				error,
+			);
+			return NextResponse.next();
 		}
-
-		// Add rate limit headers to response
-		const response = NextResponse.next();
-		response.headers.set("X-RateLimit-Limit", rateLimitResult.limit.toString());
-		response.headers.set(
-			"X-RateLimit-Remaining",
-			rateLimitResult.remaining.toString(),
-		);
-		response.headers.set(
-			"X-RateLimit-Reset",
-			new Date(rateLimitResult.reset).toISOString(),
-		);
-		return response;
 	}
 
-	// Admin auth redirect logic
+	// Rate limiting for login (stricter: 5 attempts per 15 min)
+	if (pathname === "/admin/login" && request.method === "POST") {
+		const ip = getIpAddress(request);
+		try {
+			const rateLimitResult = await checkLoginRateLimit(ip);
+			if (!rateLimitResult.success) {
+				return NextResponse.json(
+					{ error: "Too many login attempts. Please try again later." },
+					{ status: 429 },
+				);
+			}
+		} catch {
+			// Fail-open on Redis failure
+		}
+		return NextResponse.next();
+	}
+
+	// Admin auth redirect logic (only for /admin/* routes below this point)
 	// Skip login page itself to avoid redirect loop
 	if (pathname === "/admin/login") {
 		return NextResponse.next();
@@ -64,5 +105,10 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-	matcher: ["/admin/:path*", "/api/chat"],
+	matcher: [
+		"/admin/:path*",
+		"/api/chat",
+		"/api/contact",
+		"/api/sandbox/upload",
+	],
 };

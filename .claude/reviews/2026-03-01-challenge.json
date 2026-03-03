@@ -1,0 +1,237 @@
+{
+  "reviewedAt": "2026-03-01T16:07:00.000Z",
+  "target": "project (full project sweep)",
+  "targetType": "code",
+  "lensesApplied": [
+    "adversarial-code-review",
+    "logic-trace",
+    "error-path-audit",
+    "concurrency-review",
+    "regression-analysis",
+    "plan-critique",
+    "assumption-surfacing",
+    "integration-review",
+    "api-contract-review",
+    "failure-simulation",
+    "stress-scale-review",
+    "configuration-review",
+    "dependency-audit",
+    "multi-agent-debate",
+    "devils-advocate",
+    "test-generation"
+  ],
+  "rootCauseClusters": [
+    {
+      "name": "Incomplete Middleware Coverage",
+      "severity": "CRITICAL",
+      "description": "Multiple API endpoints (/api/admin/cost-status, /api/contact, /api/sandbox/upload) fall outside the middleware matcher, leaving them without rate limiting or (in one case) auth protection. The middleware is the sole defense layer for these concerns.",
+      "findingIds": [0, 1, 2]
+    },
+    {
+      "name": "Fragile Redis Initialization",
+      "severity": "HIGH",
+      "description": "Module-level Redis initialization in cost-tracking.ts and rate-limit.ts means Redis unavailability crashes all module imports, taking down the entire chat API. The rate limiter (meant to protect availability) becomes the single point of failure that destroys it.",
+      "findingIds": [4, 5]
+    },
+    {
+      "name": "IP Trust Chain Weakness",
+      "severity": "HIGH",
+      "description": "X-Forwarded-For header is trusted without validation. Combined with IP-based rate limiting and IP-based sandbox tenant isolation, IP spoofing defeats both security mechanisms simultaneously.",
+      "findingIds": [3, 6]
+    },
+    {
+      "name": "Silent Fail-Open Configuration",
+      "severity": "MEDIUM",
+      "description": "Empty string fallbacks for Supabase credentials and fire-and-forget message persistence create a system that appears functional while silently dropping data or operating without proper auth.",
+      "findingIds": [8, 9, 10]
+    }
+  ],
+  "findings": [
+    {
+      "id": 0,
+      "severity": "CRITICAL",
+      "lens": "adversarial-code-review",
+      "category": "missing-auth",
+      "file": "src/app/api/admin/cost-status/route.ts",
+      "line": 7,
+      "description": "GET handler has no auth check. Exposes daily cost, budget, alert level, and percentage used to any unauthenticated request. Unlike /api/analytics/* routes which use withAdminAuth(), this endpoint was missed.",
+      "suggestion": "Wrap with withAdminAuth() like the analytics routes: export const GET = withAdminAuth(async () => { ... });"
+    },
+    {
+      "id": 1,
+      "severity": "CRITICAL",
+      "lens": "api-contract-review",
+      "category": "missing-rate-limit",
+      "file": "src/app/api/contact/route.ts",
+      "line": 18,
+      "description": "/api/contact is not in the middleware matcher ['/admin/:path*', '/api/chat']. No rate limiting exists. No field length validation. An attacker can flood the contact_submissions table with unbounded-size payloads using the service role client (bypasses RLS).",
+      "suggestion": "Add '/api/contact' and '/api/sandbox/upload' to middleware matcher. Add maxLength validation on name (100), email (254), question (5000) fields."
+    },
+    {
+      "id": 2,
+      "severity": "HIGH",
+      "lens": "failure-simulation",
+      "category": "missing-rate-limit",
+      "file": "src/app/api/sandbox/upload/route.ts",
+      "line": 21,
+      "description": "/api/sandbox/upload is not in middleware matcher. Has file size validation but no rate limiting. Each upload triggers OpenAI embedding generation, creating a cost amplification vector.",
+      "suggestion": "Add '/api/sandbox/upload' to middleware matcher. Consider a stricter per-IP upload rate (e.g., 5/hr)."
+    },
+    {
+      "id": 3,
+      "severity": "HIGH",
+      "lens": "adversarial-code-review",
+      "category": "ip-spoofing",
+      "file": "src/lib/request-utils.ts",
+      "line": 13,
+      "description": "X-Forwarded-For header trusted without validation. Outside Vercel (local dev, preview deploys, non-Vercel proxies), the first value is fully attacker-controlled. Defeats both rate limiting and sandbox tenant isolation.",
+      "suggestion": "On Vercel, use x-vercel-forwarded-for (non-spoofable). For non-Vercel environments, validate IP format and consider using the last hop before the trusted proxy."
+    },
+    {
+      "id": 4,
+      "severity": "HIGH",
+      "lens": "error-path-audit",
+      "category": "crash-on-import",
+      "file": "src/lib/cost-tracking.ts",
+      "line": 3,
+      "description": "const redis = getRedis() at module scope. If Redis.fromEnv() fails (missing env vars, network issue), the module never loads. Since chat/route.ts imports cost-tracking, the entire chat endpoint returns 500.",
+      "suggestion": "Move getRedis() call inside each exported function, or wrap in a lazy getter that catches initialization errors and falls back gracefully."
+    },
+    {
+      "id": 5,
+      "severity": "HIGH",
+      "lens": "error-path-audit",
+      "category": "crash-on-import",
+      "file": "src/lib/rate-limit.ts",
+      "line": 4,
+      "description": "Same module-scope Redis initialization as cost-tracking.ts. Ratelimit singletons (lines 7-18) are constructed at module scope with this Redis instance.",
+      "suggestion": "Same fix: lazy-initialize inside checkRateLimit() or use a factory function."
+    },
+    {
+      "id": 6,
+      "severity": "HIGH",
+      "lens": "concurrency-review",
+      "category": "ip-based-isolation-bypass",
+      "file": "src/lib/sandbox/tenant-id.ts",
+      "line": 8,
+      "description": "Tenant ID is SHA-256(IP). Combined with IP spoofing (finding 3), an attacker controls their tenant ID. They can read other tenants' documents by using the same IP, or create unlimited tenants by rotating IPs.",
+      "suggestion": "This is a consequence of finding 3. Fixing IP extraction fixes this. Alternatively, consider session-based sandbox tokens."
+    },
+    {
+      "id": 7,
+      "severity": "HIGH",
+      "lens": "assumption-surfacing",
+      "category": "fragile-threshold",
+      "file": "src/app/api/chat/route.ts",
+      "line": 250,
+      "description": "Similarity threshold 1.15 was empirically derived from current KB content. Non-normalized pgvector scores shift with document corpus changes. Adding short FAQ docs or different semantic domains could silently cause all queries to fall below threshold, returning low-confidence for every question.",
+      "suggestion": "Add logging/monitoring for similarity score distribution. Consider dynamic threshold based on score spread, or normalize embeddings at insertion time."
+    },
+    {
+      "id": 8,
+      "severity": "MEDIUM",
+      "lens": "error-path-audit",
+      "category": "silent-data-loss",
+      "file": "src/app/api/chat/route.ts",
+      "line": 66,
+      "description": "saveMessages() called with .catch() fire-and-forget in both handleLowConfidence and handleHighConfidence. If persistence fails, the user gets a response but no conversation record exists. No monitoring, no retry.",
+      "suggestion": "At minimum, emit a structured error event. Consider awaiting persistence or adding a dead-letter queue for failed saves."
+    },
+    {
+      "id": 9,
+      "severity": "MEDIUM",
+      "lens": "configuration-review",
+      "category": "fail-open-config",
+      "file": "src/lib/supabase/server.ts",
+      "line": 33,
+      "description": "createServiceRoleClient() uses process.env.SUPABASE_SECRET_KEY ?? ''. Empty string doesn't crash createClient() but produces cryptic errors on first query. env.ts validates SUPABASE_SECRET_KEY at startup, but the fallback here masks that if env.ts is bypassed.",
+      "suggestion": "Throw explicitly if SUPABASE_SECRET_KEY is empty: const key = process.env.SUPABASE_SECRET_KEY; if (!key) throw new Error(...);"
+    },
+    {
+      "id": 10,
+      "severity": "MEDIUM",
+      "lens": "concurrency-review",
+      "category": "race-condition",
+      "file": "src/lib/cost-tracking.ts",
+      "line": 56,
+      "description": "Budget check (read) at chat/route.ts:177 is not atomic with the LLM call and subsequent cost write. N concurrent requests all read under-budget, all proceed, all write costs after completion. Budget overrun of N * cost_per_call is possible.",
+      "suggestion": "Use atomic INCRBYFLOAT with check-after-increment, or a Redis Lua script for compare-and-set."
+    },
+    {
+      "id": 11,
+      "severity": "MEDIUM",
+      "lens": "api-contract-review",
+      "category": "ux-inconsistency",
+      "file": "src/components/chat/ChatWindow.tsx",
+      "line": 207,
+      "description": "Client shows 'approaching limit' warning at 30 messages, but server enforces at 50. User sees warning for 20 more messages before actual cutoff. Mismatch could confuse users.",
+      "suggestion": "Align client warning to 40 (80% of server cap) or expose server cap as a constant shared between client and server."
+    },
+    {
+      "id": 12,
+      "severity": "MEDIUM",
+      "lens": "adversarial-code-review",
+      "category": "input-mutation",
+      "file": "src/lib/embeddings/embeddings.ts",
+      "line": 58,
+      "description": "generateEmbeddings() mutates the input texts[] array in-place when truncating oversized texts. Callers don't expect input modification. Currently only one call site (upload.ts) which doesn't reuse the array, but this is a latent defect.",
+      "suggestion": "Clone before truncation: const processed = [...texts]; then mutate processed."
+    },
+    {
+      "id": 13,
+      "severity": "MEDIUM",
+      "lens": "adversarial-code-review",
+      "category": "timing-attack",
+      "file": "src/app/actions/auth.ts",
+      "line": 16,
+      "description": "password !== process.env.ADMIN_PASSWORD uses non-constant-time string comparison. Theoretically vulnerable to timing attacks, though practically very low risk behind Vercel's variable-latency edge.",
+      "suggestion": "Use crypto.timingSafeEqual(Buffer.from(password), Buffer.from(expected)) for correctness."
+    },
+    {
+      "id": 14,
+      "severity": "MEDIUM",
+      "lens": "stress-scale-review",
+      "category": "missing-input-bounds",
+      "file": "src/app/api/contact/route.ts",
+      "line": 55,
+      "description": "question field validated only for non-empty. No maxLength check. An attacker can insert 100MB strings into contact_submissions via the service role client.",
+      "suggestion": "Add maxLength validation: if (body.question.length > 5000) return 400."
+    }
+  ],
+  "planAttacks": [
+    {
+      "attack": "The single-password auth model is fundamentally unsuitable even for a demo. It cannot be rotated without invalidating all sessions, and a leaked env var grants permanent access.",
+      "defense": "For a single-owner demo with no sensitive customer data behind the gate, ADMIN_PASSWORD + iron-session is the simplest correct solution. The session TTL (24hr) limits exposure. Rotation means changing one env var.",
+      "outcome": "Deflected"
+    },
+    {
+      "attack": "The RAG pipeline has no feedback loop. If embeddings produce bad results, there is no mechanism to detect or correct it. The magic threshold 1.15 will drift silently.",
+      "defense": "The analytics dashboard tracks answered_from_kb. Monitoring this metric reveals threshold drift. However, no automated alerting exists for this metric.",
+      "outcome": "Survived"
+    },
+    {
+      "attack": "The widget iframe architecture means the chatbot runs on the origin of the host page. CORS, cookie scope, and CSP all become host-dependent failure modes that are invisible during testing on the demo site.",
+      "defense": "The iframe isolates the widget in its own origin (the Vercel deployment URL), not the host page origin. CORS is not relevant for iframe content. Cookie scope is within the deployment origin.",
+      "outcome": "Deflected"
+    },
+    {
+      "attack": "Fire-and-forget message persistence means conversation history is unreliable. The analytics dashboard (accuracy metrics, chat volume) uses this data. Unreliable writes produce unreliable analytics.",
+      "defense": "The primary product is the AI response, not the analytics. For a demo, the response reaching the user matters more than the record. That said, there is no way to know the error rate without monitoring.",
+      "outcome": "Survived"
+    },
+    {
+      "attack": "Redis as a single point of failure for rate limiting, cost tracking, and alerts means the system has no graceful degradation path. Module-level initialization makes this crash the entire application.",
+      "defense": "The advocate argues that crashing loudly is better than serving unprotected requests. This is correct in principle but wrong in execution: the crash takes down the chat endpoint, not just the rate limiter.",
+      "outcome": "Survived"
+    }
+  ],
+  "debateVerdict": "CAUTION",
+  "overallVerdict": "CAUTION",
+  "summary": {
+    "critical": 2,
+    "high": 5,
+    "medium": 7,
+    "clusters": 4,
+    "passed": false
+  }
+}
