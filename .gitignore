@@ -43,6 +43,11 @@ yarn-error.log*
 next-env.d.ts
 .vscode/
 
+# local artifacts
+.claude/reviews/
+.claude/skills/
+HANDOFF-*.md
+
 # Nested node_modules (skills, tools)
 **/node_modules/
 **/profiles/browser-data/
