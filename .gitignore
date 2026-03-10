@@ -43,6 +43,10 @@ yarn-error.log*
 next-env.d.ts
 .vscode/
 
+# backup/migration
+/backup/
+backup-supabase.mjs
+
 # local artifacts
 .claude/reviews/
 .claude/skills/

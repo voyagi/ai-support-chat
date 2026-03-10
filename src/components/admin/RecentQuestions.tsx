@@ -2,8 +2,7 @@
 
 import { formatDistanceToNow } from "date-fns";
 import { MessageCircle } from "lucide-react";
-import { useEffect, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { useCallback, useEffect, useState } from "react";
 
 interface Message {
 	id: string;
@@ -15,30 +14,23 @@ export function RecentQuestions() {
 	const [questions, setQuestions] = useState<Message[]>([]);
 	const [loading, setLoading] = useState(true);
 
-	useEffect(() => {
-		const fetchQuestions = async () => {
-			setLoading(true);
-			try {
-				const supabase = createClient();
-				const { data, error } = await supabase
-					.from("messages")
-					.select("id, content, created_at")
-					.eq("role", "user")
-					.order("created_at", { ascending: false })
-					.limit(10);
-
-				if (error) throw error;
-				setQuestions(data ?? []);
-			} catch (error) {
-				console.error("Error fetching recent questions:", error);
-				setQuestions([]);
-			} finally {
-				setLoading(false);
-			}
-		};
-
-		void fetchQuestions();
+	const fetchQuestions = useCallback(async () => {
+		try {
+			const res = await fetch("/api/admin/recent-questions");
+			if (!res.ok) return;
+			const data = await res.json();
+			setQuestions(data);
+		} catch (error) {
+			console.error("Error fetching recent questions:", error);
+			setQuestions([]);
+		} finally {
+			setLoading(false);
+		}
 	}, []);
+
+	useEffect(() => {
+		void fetchQuestions();
+	}, [fetchQuestions]);
 
 	if (loading) {
 		return (

@@ -1,4 +1,4 @@
-import { createServiceRoleClient } from "@/lib/supabase/server";
+import { getDb } from "@/lib/db";
 
 /**
  * Maximum messages allowed per conversation (enforces 50-message cap)
@@ -8,36 +8,24 @@ export const MAX_MESSAGES_PER_CONVERSATION = 50;
 /**
  * Create a new conversation in the database
  * @returns UUID of the new conversation
- * @throws Error with descriptive message if creation fails
  */
 export async function createConversation(): Promise<string> {
-	const supabase = createServiceRoleClient();
+	const sql = getDb();
 
-	const { data, error } = await supabase
-		.from("conversations")
-		.insert({})
-		.select("id")
-		.single();
+	const rows = await sql`
+		INSERT INTO conversations DEFAULT VALUES
+		RETURNING id
+	`;
 
-	if (error) {
-		throw new Error(`Failed to create conversation: ${error.message}`);
-	}
-
-	if (!data?.id) {
+	if (!rows[0]?.id) {
 		throw new Error("Failed to create conversation: No ID returned");
 	}
 
-	return data.id;
+	return rows[0].id as string;
 }
 
 /**
  * Save user and assistant messages to a conversation
- * Inserts both messages in a single database call
- * @param conversationId - UUID of the conversation
- * @param userContent - User's message content
- * @param assistantContent - Assistant's response content
- * @param answeredFromKb - Whether the response was grounded in KB (default: true)
- * @throws Error with descriptive message if save fails
  */
 export async function saveMessages(
 	conversationId: string,
@@ -45,32 +33,18 @@ export async function saveMessages(
 	assistantContent: string,
 	answeredFromKb = true,
 ): Promise<void> {
-	const supabase = createServiceRoleClient();
+	const sql = getDb();
 
-	const { error } = await supabase.from("messages").insert([
-		{
-			conversation_id: conversationId,
-			role: "user",
-			content: userContent,
-		},
-		{
-			conversation_id: conversationId,
-			role: "assistant",
-			content: assistantContent,
-			answered_from_kb: answeredFromKb,
-		},
-	]);
-
-	if (error) {
-		throw new Error(`Failed to save messages: ${error.message}`);
-	}
+	await sql`
+		INSERT INTO messages (conversation_id, role, content, answered_from_kb)
+		VALUES
+			(${conversationId}, 'user', ${userContent}, NULL),
+			(${conversationId}, 'assistant', ${assistantContent}, ${answeredFromKb})
+	`;
 }
 
 /**
  * Get the total number of messages in a conversation
- * Used to enforce the 50-message cap
- * @param conversationId - UUID of the conversation (can be null/undefined)
- * @returns Count of messages (0 if conversationId is null/undefined)
  */
 export async function getMessageCount(
 	conversationId: string | null | undefined,
@@ -79,16 +53,13 @@ export async function getMessageCount(
 		return 0;
 	}
 
-	const supabase = createServiceRoleClient();
+	const sql = getDb();
 
-	const { count, error } = await supabase
-		.from("messages")
-		.select("*", { count: "exact", head: true })
-		.eq("conversation_id", conversationId);
+	const rows = await sql`
+		SELECT COUNT(*)::int AS count
+		FROM messages
+		WHERE conversation_id = ${conversationId}
+	`;
 
-	if (error) {
-		throw new Error(`Failed to get message count: ${error.message}`);
-	}
-
-	return count ?? 0;
+	return (rows[0]?.count as number) ?? 0;
 }

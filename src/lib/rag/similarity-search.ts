@@ -1,6 +1,6 @@
+import { getDb } from "@/lib/db";
 import { generateEmbedding } from "@/lib/embeddings/embeddings";
 import { getErrorMessage } from "@/lib/errors";
-import { createServiceRoleClient } from "@/lib/supabase/server";
 
 export interface SimilarChunk {
 	id: string;
@@ -32,7 +32,6 @@ export async function searchSimilarChunks(
 	const threshold = options?.threshold ?? 0.7;
 	const count = options?.count ?? 5;
 
-	// Generate embedding for the query
 	let queryEmbedding: number[];
 	try {
 		queryEmbedding = await generateEmbedding(query);
@@ -42,57 +41,39 @@ export async function searchSimilarChunks(
 		);
 	}
 
-	// Query Supabase using RPC function
-	const supabase = createServiceRoleClient();
+	const sql = getDb();
+	const embeddingStr = `[${queryEmbedding.join(",")}]`;
+	const tenantId = options?.tenantId ?? null;
 
-	// Build RPC parameters, conditionally including tenant_id
-	const rpcParams: Record<string, unknown> = {
-		query_embedding: queryEmbedding,
-		match_threshold: threshold,
-		match_count: count,
-	};
-
-	// Add p_tenant_id if provided (enables multi-tenant RAG search)
-	// Prefixed to avoid PostgreSQL column/parameter name collision
-	if (options?.tenantId) {
-		rpcParams.p_tenant_id = options.tenantId;
-	}
-
-	const { data, error } = await supabase.rpc(
-		"match_document_chunks",
-		rpcParams,
-	);
-
-	if (error) {
-		throw new Error(
-			`Similarity search RPC failed: ${error.message} (code: ${error.code})`,
-		);
-	}
+	const data = await sql`
+		SELECT
+			dc.id,
+			dc.document_id,
+			dc.document_title,
+			dc.section_heading,
+			dc.content,
+			dc.chunk_position,
+			dc.total_chunks,
+			1 - (dc.embedding <=> ${embeddingStr}::vector) AS similarity
+		FROM document_chunks dc
+		WHERE 1 - (dc.embedding <=> ${embeddingStr}::vector) > ${threshold}
+			AND (${tenantId}::text IS NULL OR dc.tenant_id = ${tenantId})
+		ORDER BY dc.embedding <=> ${embeddingStr}::vector
+		LIMIT ${count}
+	`;
 
 	if (!data || data.length === 0) {
 		return [];
 	}
 
-	// Map snake_case response to camelCase SimilarChunk interface
-	return data.map(
-		(row: {
-			id: string;
-			document_id: string;
-			document_title: string;
-			section_heading: string;
-			content: string;
-			chunk_position: number;
-			total_chunks: number;
-			similarity: number;
-		}) => ({
-			id: row.id,
-			documentId: row.document_id,
-			documentTitle: row.document_title,
-			sectionHeading: row.section_heading,
-			content: row.content,
-			chunkPosition: row.chunk_position,
-			totalChunks: row.total_chunks,
-			similarity: row.similarity,
-		}),
-	);
+	return data.map((row) => ({
+		id: row.id as string,
+		documentId: row.document_id as string,
+		documentTitle: row.document_title as string,
+		sectionHeading: row.section_heading as string,
+		content: row.content as string,
+		chunkPosition: row.chunk_position as number,
+		totalChunks: row.total_chunks as number,
+		similarity: row.similarity as number,
+	}));
 }
