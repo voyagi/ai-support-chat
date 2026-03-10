@@ -1,6 +1,6 @@
 import { timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
-import { createServiceRoleClient } from "@/lib/supabase/server";
+import { getDb } from "@/lib/db";
 
 /**
  * Daily cleanup cron for sandbox tenant data.
@@ -22,7 +22,6 @@ export async function GET(request: Request) {
 		}
 
 		// Timing-safe comparison to prevent timing attacks on the secret
-		// Vercel sends Authorization: Bearer <CRON_SECRET> on genuine cron invocations
 		const expected = Buffer.from(`Bearer ${cronSecret}`, "utf-8");
 		const actual = Buffer.from(authHeader ?? "", "utf-8");
 		const isValidSecret =
@@ -38,30 +37,20 @@ export async function GET(request: Request) {
 		// Calculate cutoff time: 24 hours ago
 		const cutoffTime = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 
-		const supabase = createServiceRoleClient();
+		const sql = getDb();
 
 		// Delete tenant documents older than cutoff
 		// FK cascade will automatically delete corresponding document_chunks
-		const { count, error } = await supabase
-			.from("documents")
-			.delete({ count: "exact" })
-			.not("tenant_id", "is", null) // Only delete tenant docs, not main KB
-			.lt("created_at", cutoffTime);
-
-		if (error) {
-			console.error("Cleanup cron failed:", error);
-			return NextResponse.json(
-				{
-					success: false,
-					error: `Failed to delete documents: ${error.message}`,
-				},
-				{ status: 500 },
-			);
-		}
+		const rows = await sql`
+			DELETE FROM documents
+			WHERE tenant_id IS NOT NULL
+				AND created_at < ${cutoffTime}
+			RETURNING id
+		`;
 
 		return NextResponse.json({
 			success: true,
-			deletedCount: count ?? 0,
+			deletedCount: rows.length,
 			cutoffTime,
 		});
 	} catch (error) {

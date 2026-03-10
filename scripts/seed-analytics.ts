@@ -1,16 +1,12 @@
-import { createClient } from "@supabase/supabase-js";
+import { neon } from "@neondatabase/serverless";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
-const supabaseKey = process.env.SUPABASE_SECRET_KEY ?? "";
-
-if (!supabaseUrl || !supabaseKey) {
-	console.error(
-		"Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SECRET_KEY environment variables",
-	);
+const DATABASE_URL = process.env.DATABASE_URL;
+if (!DATABASE_URL) {
+	console.error("Missing DATABASE_URL environment variable");
 	process.exit(1);
 }
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+const sql = neon(DATABASE_URL);
 
 // Sample user questions (realistic FlowBoard topics)
 const sampleQuestions = [
@@ -60,23 +56,14 @@ const sampleResponses = [
 	"Account deletion can be requested from the security settings page.",
 ];
 
-/**
- * Get a random item from an array
- */
 function randomItem<T>(arr: T[]): T {
 	return arr[Math.floor(Math.random() * arr.length)] as T;
 }
 
-/**
- * Get a random integer between min (inclusive) and max (inclusive)
- */
 function randomInt(min: number, max: number): number {
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-/**
- * Generate a timestamp offset from a base date
- */
 function offsetTimestamp(baseDate: Date, minutesOffset: number): string {
 	const timestamp = new Date(baseDate);
 	timestamp.setMinutes(timestamp.getMinutes() + minutesOffset);
@@ -84,58 +71,42 @@ function offsetTimestamp(baseDate: Date, minutesOffset: number): string {
 }
 
 async function main() {
-	console.log("🌱 Seeding analytics test data (30 days)...\n");
+	console.log("Seeding analytics test data (30 days)...\n");
 
-	// Delete all existing conversations and messages (idempotent approach)
+	// Delete all existing conversations (cascades to messages)
 	console.log("Clearing existing data...");
-	const { error: deleteError } = await supabase
-		.from("conversations")
-		.delete()
-		.neq("id", "00000000-0000-0000-0000-000000000000"); // Delete all (neq impossible ID)
-
-	if (deleteError) {
-		console.error("Failed to clear existing data:", deleteError.message);
-		process.exit(1);
-	}
+	await sql`DELETE FROM conversations WHERE id IS NOT NULL`;
 
 	let totalConversations = 0;
 	let totalMessages = 0;
 
-	// Generate 30 days of data
 	for (let daysAgo = 29; daysAgo >= 0; daysAgo--) {
 		const baseDate = new Date();
 		baseDate.setDate(baseDate.getDate() - daysAgo);
-		baseDate.setHours(randomInt(8, 20), randomInt(0, 59), 0, 0); // Random time during business hours
+		baseDate.setHours(randomInt(8, 20), randomInt(0, 59), 0, 0);
 
-		// Random number of conversations per day (weighted toward 2-5)
 		const conversationCount =
 			Math.random() < 0.2 ? randomInt(0, 1) : randomInt(2, 8);
 
 		for (let convIdx = 0; convIdx < conversationCount; convIdx++) {
-			// Spread conversations throughout the day
 			const conversationTime = new Date(baseDate);
 			conversationTime.setMinutes(conversationTime.getMinutes() + convIdx * 60);
 
-			// Create conversation
-			const { data: conversation, error: convError } = await supabase
-				.from("conversations")
-				.insert({ created_at: conversationTime.toISOString() })
-				.select("id")
-				.single();
+			const convRows = await sql`
+				INSERT INTO conversations (created_at)
+				VALUES (${conversationTime.toISOString()})
+				RETURNING id
+			`;
 
-			if (convError || !conversation) {
-				console.error(
-					`Failed to create conversation for day ${daysAgo}:`,
-					convError?.message,
-				);
+			if (!convRows[0]?.id) {
+				console.error(`Failed to create conversation for day ${daysAgo}`);
 				continue;
 			}
 
+			const conversationId = convRows[0].id as string;
 			totalConversations++;
 
-			// Generate 2-10 messages per conversation (alternating user/assistant)
 			const messageCount = randomInt(2, 10);
-			const messages = [];
 
 			for (let msgIdx = 0; msgIdx < messageCount; msgIdx++) {
 				const role = msgIdx % 2 === 0 ? "user" : "assistant";
@@ -144,52 +115,27 @@ async function main() {
 						? randomItem(sampleQuestions)
 						: randomItem(sampleResponses);
 
-				// Spread messages within conversation (1-3 minutes apart)
 				const messageTime = offsetTimestamp(
 					conversationTime,
 					msgIdx * randomInt(1, 3),
 				);
 
-				const message: {
-					conversation_id: string;
-					role: string;
-					content: string;
-					created_at: string;
-					answered_from_kb?: boolean;
-				} = {
-					conversation_id: conversation.id,
-					role,
-					content,
-					created_at: messageTime,
-				};
+				const answeredFromKb =
+					role === "assistant" ? Math.random() < 0.8 : null;
 
-				// Set answered_from_kb for assistant messages (~80% true, ~20% false)
-				if (role === "assistant") {
-					message.answered_from_kb = Math.random() < 0.8;
-				}
+				await sql`
+					INSERT INTO messages (conversation_id, role, content, created_at, answered_from_kb)
+					VALUES (${conversationId}, ${role}, ${content}, ${messageTime}, ${answeredFromKb})
+				`;
 
-				messages.push(message);
+				totalMessages++;
 			}
-
-			const { error: msgError } = await supabase
-				.from("messages")
-				.insert(messages);
-
-			if (msgError) {
-				console.error(
-					`Failed to insert messages for conversation ${conversation.id}:`,
-					msgError.message,
-				);
-				continue;
-			}
-
-			totalMessages += messages.length;
 		}
 	}
 
-	console.log("\n✅ Seeding complete!");
+	console.log("\nSeeding complete!");
 	console.log(
-		`📊 Generated ${totalConversations} conversations with ${totalMessages} messages over 30 days`,
+		`Generated ${totalConversations} conversations with ${totalMessages} messages over 30 days`,
 	);
 }
 

@@ -1,4 +1,4 @@
-import { createServiceRoleClient } from "@/lib/supabase/server";
+import { getDb } from "@/lib/db";
 
 interface ContactSubmissionBody {
 	conversationId: string | null;
@@ -83,31 +83,15 @@ export async function POST(req: Request) {
 			);
 		}
 
-		// conversationId is optional (can be null for edge cases)
-
 		// 2. Insert into database
-		const supabase = createServiceRoleClient();
-		const { data, error } = await supabase
-			.from("contact_submissions")
-			.insert({
-				conversation_id: body.conversationId || null,
-				name: body.name.trim(),
-				email: body.email.trim(),
-				original_question: body.question.trim(),
-				status: "pending",
-			})
-			.select("id")
-			.single();
+		const sql = getDb();
+		const rows = await sql`
+			INSERT INTO contact_submissions (conversation_id, name, email, original_question, status)
+			VALUES (${body.conversationId || null}, ${body.name.trim()}, ${body.email.trim()}, ${body.question.trim()}, 'pending')
+			RETURNING id
+		`;
 
-		if (error) {
-			console.error("Failed to save contact submission:", error);
-			return Response.json(
-				{ error: "Failed to save contact submission. Please try again." },
-				{ status: 500 },
-			);
-		}
-
-		if (!data?.id) {
+		if (!rows[0]?.id) {
 			console.error("Contact submission created but no ID returned");
 			return Response.json(
 				{ error: "Failed to save contact submission. Please try again." },
@@ -118,7 +102,7 @@ export async function POST(req: Request) {
 		// 3. Return success
 		return Response.json({
 			success: true,
-			id: data.id,
+			id: rows[0].id,
 		});
 	} catch (error) {
 		console.error("Contact API error:", error);

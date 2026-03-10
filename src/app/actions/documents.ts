@@ -2,12 +2,12 @@
 
 import { revalidatePath } from "next/cache";
 import { getSession } from "@/lib/auth/session";
+import { getDb } from "@/lib/db";
 import {
 	extractDocumentTitle,
 	processDocumentUpload,
 } from "@/lib/documents/upload";
 import { getErrorMessage } from "@/lib/errors";
-import { createServiceRoleClient } from "@/lib/supabase/server";
 
 export interface DocumentListItem {
 	id: string;
@@ -97,35 +97,26 @@ export async function listDocuments(): Promise<DocumentListItem[]> {
 		return [];
 	}
 
-	const supabase = createServiceRoleClient();
+	const sql = getDb();
 
-	const { data: documents, error } = await supabase
-		.from("documents")
-		.select("id, title, created_at")
-		.order("created_at", { ascending: false });
+	const rows = await sql`
+		SELECT
+			d.id,
+			d.title,
+			d.created_at,
+			COUNT(dc.id)::int AS chunk_count
+		FROM documents d
+		LEFT JOIN document_chunks dc ON dc.document_id = d.id
+		GROUP BY d.id, d.title, d.created_at
+		ORDER BY d.created_at DESC
+	`;
 
-	if (error || !documents) {
-		console.error("Failed to list documents:", error?.message);
-		return [];
-	}
-
-	// Get chunk counts per document
-	const documentItems: DocumentListItem[] = [];
-	for (const doc of documents) {
-		const { count } = await supabase
-			.from("document_chunks")
-			.select("id", { count: "exact", head: true })
-			.eq("document_id", doc.id);
-
-		documentItems.push({
-			id: doc.id,
-			title: doc.title,
-			createdAt: doc.created_at,
-			chunkCount: count ?? 0,
-		});
-	}
-
-	return documentItems;
+	return rows.map((row) => ({
+		id: row.id as string,
+		title: row.title as string,
+		createdAt: row.created_at as string,
+		chunkCount: row.chunk_count as number,
+	}));
 }
 
 /**
@@ -139,22 +130,18 @@ export async function deleteDocument(
 		return { success: false, error: "Not authenticated" };
 	}
 
-	const supabase = createServiceRoleClient();
+	try {
+		const sql = getDb();
+		await sql`DELETE FROM documents WHERE id = ${documentId}`;
 
-	const { error } = await supabase
-		.from("documents")
-		.delete()
-		.eq("id", documentId);
-
-	if (error) {
+		revalidatePath("/admin");
+		return { success: true };
+	} catch (error) {
 		return {
 			success: false,
-			error: `Failed to delete document: ${error.message}`,
+			error: `Failed to delete document: ${getErrorMessage(error)}`,
 		};
 	}
-
-	revalidatePath("/admin");
-	return { success: true };
 }
 
 /**
@@ -168,24 +155,20 @@ export async function getDocumentChunks(
 		return [];
 	}
 
-	const supabase = createServiceRoleClient();
+	const sql = getDb();
 
-	const { data: chunks, error } = await supabase
-		.from("document_chunks")
-		.select("id, content, section_heading, chunk_position, total_chunks")
-		.eq("document_id", documentId)
-		.order("chunk_position", { ascending: true });
+	const rows = await sql`
+		SELECT id, content, section_heading, chunk_position, total_chunks
+		FROM document_chunks
+		WHERE document_id = ${documentId}
+		ORDER BY chunk_position ASC
+	`;
 
-	if (error || !chunks) {
-		console.error("Failed to get document chunks:", error?.message);
-		return [];
-	}
-
-	return chunks.map((chunk) => ({
-		id: chunk.id,
-		content: chunk.content,
-		sectionHeading: chunk.section_heading,
-		chunkPosition: chunk.chunk_position,
-		totalChunks: chunk.total_chunks,
+	return rows.map((row) => ({
+		id: row.id as string,
+		content: row.content as string,
+		sectionHeading: row.section_heading as string,
+		chunkPosition: row.chunk_position as number,
+		totalChunks: row.total_chunks as number,
 	}));
 }

@@ -21,7 +21,7 @@ knowledge base (FAQ/docs). Two UI modes:
 
 - Chat interface with streaming responses
 - RAG: answers grounded in uploaded knowledge base documents
-- Conversation history persisted in Supabase
+- Conversation history persisted in Neon Postgres
 - Admin panel to upload/manage knowledge base docs
 - Widget embed code generator
 
@@ -36,8 +36,8 @@ knowledge base (FAQ/docs). Two UI modes:
 
 - **Framework**: Next.js 15 (App Router, TypeScript)
 - **AI**: OpenAI API (GPT-4o-mini for cost efficiency, gpt-4o fallback)
-- **RAG**: OpenAI embeddings + Supabase pgvector
-- **Database**: Supabase (auth, Postgres, pgvector, storage for docs)
+- **RAG**: OpenAI embeddings + Neon pgvector
+- **Database**: Neon Postgres (serverless, pgvector, EU region)
 - **Styling**: Tailwind CSS v4
 - **Linter/Formatter**: Biome (NOT ESLint/Prettier)
 - **Deployment**: Vercel
@@ -72,72 +72,18 @@ src/
       UploadForm.tsx
     ui/                   — Shared UI primitives
   lib/
+    db.ts                 — Neon serverless client
     openai.ts             — OpenAI client + RAG search
-    supabase/
-      client.ts           — Browser Supabase client
-      server.ts           — Server Supabase client
-      middleware.ts        — Auth middleware
     embeddings.ts         — Document chunking + embedding generation
     cn.ts                 — clsx + tailwind-merge utility
 ```
 
-## Database Schema (Supabase)
+## Database Schema (Neon Postgres)
 
-```sql
--- Knowledge base documents
-create table documents (
-  id uuid primary key default gen_random_uuid(),
-  title text not null,
-  content text not null,
-  created_at timestamptz default now()
-);
-
--- Document chunks with embeddings for RAG
-create table document_chunks (
-  id uuid primary key default gen_random_uuid(),
-  document_id uuid references documents(id) on delete cascade,
-  content text not null,
-  embedding vector(1536),
-  created_at timestamptz default now()
-);
-
--- Conversations
-create table conversations (
-  id uuid primary key default gen_random_uuid(),
-  created_at timestamptz default now()
-);
-
--- Messages within conversations
-create table messages (
-  id uuid primary key default gen_random_uuid(),
-  conversation_id uuid references conversations(id) on delete cascade,
-  role text not null check (role in ('user', 'assistant')),
-  content text not null,
-  created_at timestamptz default now()
-);
-
--- Similarity search function
-create or replace function match_document_chunks(
-  query_embedding vector(1536),
-  match_threshold float,
-  match_count int
-) returns table (
-  id uuid,
-  document_id uuid,
-  content text,
-  similarity float
-) language sql stable as $$
-  select
-    dc.id,
-    dc.document_id,
-    dc.content,
-    1 - (dc.embedding <=> query_embedding) as similarity
-  from document_chunks dc
-  where 1 - (dc.embedding <=> query_embedding) > match_threshold
-  order by dc.embedding <=> query_embedding
-  limit match_count;
-$$;
-```
+Full schema in `backup/neon-schema.sql`. Key tables: documents,
+document_chunks (with pgvector embeddings), conversations, messages,
+contact_submissions. Uses `@neondatabase/serverless` tagged template
+queries (not an ORM).
 
 ## RAG Flow
 
@@ -154,9 +100,9 @@ $$;
 Copy `.env.example` to `.env.local` and fill in:
 
 - `OPENAI_API_KEY` — OpenAI API key
-- `NEXT_PUBLIC_SUPABASE_URL` — Supabase project URL
-- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` — Supabase publishable key
-- `SUPABASE_SECRET_KEY` — Supabase secret key (server-side only)
+- `DATABASE_URL` — Neon Postgres connection string
+- `ADMIN_PASSWORD` — Admin panel access
+- `SESSION_SECRET` — iron-session encryption (32+ chars)
 
 ## Demo Data
 

@@ -1,8 +1,7 @@
 "use client";
 
 import { BarChart3, MessageSquare, MessagesSquare } from "lucide-react";
-import { useEffect, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { useCallback, useEffect, useState } from "react";
 
 interface MetricCardProps {
 	label: string;
@@ -32,92 +31,26 @@ export function RealtimeMetrics() {
 	const [totalMessages, setTotalMessages] = useState(0);
 	const [loading, setLoading] = useState(true);
 
-	useEffect(() => {
-		const supabase = createClient();
-
-		// Get today's date at midnight for filtering
-		const today = new Date();
-		today.setHours(0, 0, 0, 0);
-		const todayIso = today.toISOString();
-
-		// Fetch initial counts
-		const fetchInitialCounts = async () => {
-			try {
-				// Total conversations
-				const { count: convCount } = await supabase
-					.from("conversations")
-					.select("*", { count: "exact", head: true });
-
-				// Messages today
-				const { count: todayCount } = await supabase
-					.from("messages")
-					.select("*", { count: "exact", head: true })
-					.gte("created_at", todayIso);
-
-				// Total messages
-				const { count: totalCount } = await supabase
-					.from("messages")
-					.select("*", { count: "exact", head: true });
-
-				setTotalConversations(convCount ?? 0);
-				setMessagesToday(todayCount ?? 0);
-				setTotalMessages(totalCount ?? 0);
-			} catch (error) {
-				console.error("Error fetching initial counts:", error);
-			} finally {
-				setLoading(false);
-			}
-		};
-
-		void fetchInitialCounts();
-
-		// Subscribe to conversations
-		const conversationsChannel = supabase
-			.channel("conversations-realtime")
-			.on(
-				"postgres_changes",
-				{
-					event: "INSERT",
-					schema: "public",
-					table: "conversations",
-				},
-				() => {
-					setTotalConversations((prev) => prev + 1);
-				},
-			)
-			.subscribe();
-
-		// Subscribe to messages
-		const messagesChannel = supabase
-			.channel("messages-realtime")
-			.on(
-				"postgres_changes",
-				{
-					event: "INSERT",
-					schema: "public",
-					table: "messages",
-				},
-				(payload) => {
-					// Increment total messages
-					setTotalMessages((prev) => prev + 1);
-
-					// Check if message was created today
-					const messageDate = new Date(
-						(payload.new as { created_at: string }).created_at,
-					);
-					if (messageDate >= today) {
-						setMessagesToday((prev) => prev + 1);
-					}
-				},
-			)
-			.subscribe();
-
-		// Cleanup subscriptions
-		return () => {
-			void supabase.removeChannel(conversationsChannel);
-			void supabase.removeChannel(messagesChannel);
-		};
+	const fetchMetrics = useCallback(async () => {
+		try {
+			const res = await fetch("/api/admin/metrics");
+			if (!res.ok) return;
+			const data = await res.json();
+			setTotalConversations(data.totalConversations);
+			setMessagesToday(data.messagesToday);
+			setTotalMessages(data.totalMessages);
+		} catch (error) {
+			console.error("Error fetching metrics:", error);
+		} finally {
+			setLoading(false);
+		}
 	}, []);
+
+	useEffect(() => {
+		void fetchMetrics();
+		const interval = setInterval(fetchMetrics, 5000);
+		return () => clearInterval(interval);
+	}, [fetchMetrics]);
 
 	if (loading) {
 		return (

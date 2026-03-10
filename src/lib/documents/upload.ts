@@ -1,6 +1,6 @@
+import { getDb } from "@/lib/db";
 import { chunkMarkdown } from "@/lib/embeddings/chunker";
 import { generateEmbeddings } from "@/lib/embeddings/embeddings";
-import { createServiceRoleClient } from "@/lib/supabase/server";
 
 interface UploadOptions {
 	tenantId?: string;
@@ -32,80 +32,58 @@ export function extractDocumentTitle(
 /**
  * Core document upload pipeline: insert record, chunk, embed, store chunks.
  * Cleans up the document record on failure.
- * Callers handle auth, file validation, and response formatting.
  */
 export async function processDocumentUpload(
 	content: string,
 	title: string,
 	options?: UploadOptions,
 ): Promise<UploadResult> {
-	const supabase = createServiceRoleClient();
+	const sql = getDb();
 	let documentId: string | undefined;
 
 	try {
 		// Insert document record
-		const insertData: Record<string, unknown> = { title, content };
-		if (options?.tenantId) {
-			insertData.tenant_id = options.tenantId;
+		const docRows = await sql`
+			INSERT INTO documents (title, content, tenant_id)
+			VALUES (${title}, ${content}, ${options?.tenantId ?? null})
+			RETURNING id
+		`;
+
+		if (!docRows[0]?.id) {
+			throw new Error("Failed to insert document: No ID returned");
 		}
 
-		const { data: document, error: docError } = await supabase
-			.from("documents")
-			.insert(insertData)
-			.select("id")
-			.single();
-
-		if (docError || !document) {
-			throw new Error(
-				`Failed to insert document: ${docError?.message ?? "Unknown error"}`,
-			);
-		}
-
-		documentId = document.id;
-		const confirmedId: string = document.id;
+		documentId = docRows[0].id as string;
 
 		// Chunk the content
 		const chunks = chunkMarkdown({ title, content });
 
 		if (chunks.length === 0) {
-			return { documentId: confirmedId, chunkCount: 0 };
+			return { documentId, chunkCount: 0 };
 		}
 
 		// Generate embeddings for all chunks
 		const chunkTexts = chunks.map((chunk) => chunk.content);
 		const embeddings = await generateEmbeddings(chunkTexts);
 
-		// Prepare chunk records with metadata
-		const chunkRecords = chunks.map((chunk, index) => {
-			const record: Record<string, unknown> = {
-				document_id: confirmedId,
-				document_title: chunk.documentTitle,
-				section_heading: chunk.sectionHeading,
-				content: chunk.content,
-				chunk_position: chunk.position,
-				total_chunks: chunk.totalChunks,
-				embedding: embeddings[index],
-			};
-			if (options?.tenantId) {
-				record.tenant_id = options.tenantId;
-			}
-			return record;
-		});
-
 		// Insert chunks with embeddings
-		const { error: chunksError } = await supabase
-			.from("document_chunks")
-			.insert(chunkRecords);
+		for (let i = 0; i < chunks.length; i++) {
+			const chunk = chunks[i];
+			const embeddingStr = `[${embeddings[i].join(",")}]`;
 
-		if (chunksError) {
-			throw new Error(`Failed to insert chunks: ${chunksError.message}`);
+			await sql`
+				INSERT INTO document_chunks
+					(document_id, document_title, section_heading, content, chunk_position, total_chunks, embedding, tenant_id)
+				VALUES
+					(${documentId}, ${chunk.documentTitle}, ${chunk.sectionHeading}, ${chunk.content}, ${chunk.position}, ${chunk.totalChunks}, ${embeddingStr}::vector, ${options?.tenantId ?? null})
+			`;
 		}
 
-		return { documentId: confirmedId, chunkCount: chunks.length };
+		return { documentId, chunkCount: chunks.length };
 	} catch (error) {
 		// Clean up orphan document if processing failed after insert
 		if (documentId) {
-			await supabase.from("documents").delete().eq("id", documentId);
+			await sql`DELETE FROM documents WHERE id = ${documentId}`;
 		}
 		throw error;
 	}

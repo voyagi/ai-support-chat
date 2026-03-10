@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth/session";
-import { createServiceRoleClient } from "@/lib/supabase/server";
+import { getDb } from "@/lib/db";
 import { ContactsTable } from "./ContactsTable";
 
 export default async function ContactsPage() {
@@ -9,18 +9,12 @@ export default async function ContactsPage() {
 		redirect("/admin/login");
 	}
 
-	// Fetch contact submissions
-	const supabase = createServiceRoleClient();
-	const { data: submissions, error } = await supabase
-		.from("contact_submissions")
-		.select(
-			"id, name, email, original_question, status, created_at, conversation_id",
-		)
-		.order("created_at", { ascending: false });
-
-	if (error) {
-		console.error("Failed to fetch contact submissions:", error);
-	}
+	const sql = getDb();
+	const submissions = await sql`
+		SELECT id, name, email, original_question, status, created_at, conversation_id
+		FROM contact_submissions
+		ORDER BY created_at DESC
+	`;
 
 	return (
 		<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -35,7 +29,19 @@ export default async function ContactsPage() {
 			</div>
 
 			{/* Contacts Table */}
-			<ContactsTable submissions={submissions || []} />
+			<ContactsTable
+				submissions={
+					submissions as Array<{
+						id: string;
+						name: string;
+						email: string;
+						original_question: string;
+						status: "pending" | "contacted" | "resolved";
+						created_at: string;
+						conversation_id: string | null;
+					}>
+				}
+			/>
 		</div>
 	);
 }

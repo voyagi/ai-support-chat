@@ -1,10 +1,16 @@
 import fs from "node:fs";
 import path from "node:path";
+import { neon } from "@neondatabase/serverless";
 import { chunkMarkdown } from "../src/lib/embeddings/chunker";
 import { generateEmbeddings } from "../src/lib/embeddings/embeddings";
-import { createServiceRoleClient } from "../src/lib/supabase/server";
 
 const DRY_RUN = process.argv.includes("--dry-run");
+
+if (!process.env.DATABASE_URL && !DRY_RUN) {
+	console.error("Missing DATABASE_URL environment variable");
+	process.exit(1);
+}
+const DATABASE_URL = process.env.DATABASE_URL ?? "";
 
 interface DocumentStats {
 	filename: string;
@@ -24,7 +30,7 @@ function extractTitle(content: string): string {
 }
 
 /**
- * Seed a single document into Supabase
+ * Seed a single document into Neon
  */
 async function seedDocument(
 	filepath: string,
@@ -39,12 +45,10 @@ async function seedDocument(
 	};
 
 	try {
-		// Read file
 		const content = fs.readFileSync(filepath, "utf-8");
 		const title = extractTitle(content);
 		stats.title = title;
 
-		// Chunk the document
 		const chunks = chunkMarkdown({ title, content });
 		stats.chunkCount = chunks.length;
 		stats.totalTokens = chunks.reduce(
@@ -61,55 +65,46 @@ async function seedDocument(
 			return stats;
 		}
 
-		// Database operations require credentials
-		const supabase = createServiceRoleClient();
+		const sql = neon(DATABASE_URL);
 
 		// Check if document already exists (idempotency)
-		const { data: existing } = await supabase
-			.from("documents")
-			.select("id")
-			.eq("title", title)
-			.single();
+		const existing = await sql`
+			SELECT id FROM documents WHERE title = ${title} LIMIT 1
+		`;
 
-		if (existing) {
-			// Delete existing document (cascade will delete chunks)
+		if (existing.length > 0) {
 			console.log(`  Re-uploading existing document: ${title}`);
-			await supabase.from("documents").delete().eq("id", existing.id);
+			await sql`DELETE FROM documents WHERE id = ${existing[0].id}`;
 		}
 
 		// Insert document
-		const { data: document, error: docError } = await supabase
-			.from("documents")
-			.insert({ title, content })
-			.select("id")
-			.single();
+		const docRows = await sql`
+			INSERT INTO documents (title, content)
+			VALUES (${title}, ${content})
+			RETURNING id
+		`;
 
-		if (docError || !document) {
-			throw new Error(`Failed to insert document: ${docError?.message}`);
+		if (!docRows[0]?.id) {
+			throw new Error("Failed to insert document: No ID returned");
 		}
+
+		const documentId = docRows[0].id as string;
 
 		// Generate embeddings for all chunks
 		const chunkTexts = chunks.map((chunk) => chunk.content);
 		const embeddings = await generateEmbeddings(chunkTexts);
 
-		// Prepare chunk records
-		const chunkRecords = chunks.map((chunk, index) => ({
-			document_id: document.id,
-			document_title: chunk.documentTitle,
-			section_heading: chunk.sectionHeading,
-			content: chunk.content,
-			chunk_position: chunk.position,
-			total_chunks: chunk.totalChunks,
-			embedding: embeddings[index],
-		}));
-
 		// Insert chunks with embeddings
-		const { error: chunksError } = await supabase
-			.from("document_chunks")
-			.insert(chunkRecords);
+		for (let i = 0; i < chunks.length; i++) {
+			const chunk = chunks[i];
+			const embeddingStr = `[${embeddings[i].join(",")}]`;
 
-		if (chunksError) {
-			throw new Error(`Failed to insert chunks: ${chunksError.message}`);
+			await sql`
+				INSERT INTO document_chunks
+					(document_id, document_title, section_heading, content, chunk_position, total_chunks, embedding)
+				VALUES
+					(${documentId}, ${chunk.documentTitle}, ${chunk.sectionHeading}, ${chunk.content}, ${chunk.position}, ${chunk.totalChunks}, ${embeddingStr}::vector)
+			`;
 		}
 
 		stats.success = true;
@@ -154,9 +149,9 @@ async function main() {
 	const totalTokens = allStats.reduce((sum, s) => sum + s.totalTokens, 0);
 
 	console.log(`Documents processed: ${allStats.length}`);
-	console.log(`  ✓ Success: ${successCount}`);
+	console.log(`  Success: ${successCount}`);
 	if (failureCount > 0) {
-		console.log(`  ✗ Failed: ${failureCount}`);
+		console.log(`  Failed: ${failureCount}`);
 	}
 	console.log(`Total chunks: ${totalChunks}`);
 	console.log(`Total tokens: ${totalTokens}`);
@@ -169,7 +164,7 @@ async function main() {
 		process.exit(1);
 	}
 
-	console.log("\n✓ Seeding complete!");
+	console.log("\nSeeding complete!");
 }
 
 main().catch((error) => {
