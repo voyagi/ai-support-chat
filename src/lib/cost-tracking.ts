@@ -35,9 +35,14 @@ function getTodayKey(): string {
 }
 
 export async function getCurrentCost(): Promise<number> {
-	const key = getTodayKey();
-	const cost = await getRedis().get<number>(key);
-	return cost ?? 0;
+	try {
+		const key = getTodayKey();
+		const cost = await getRedis().get<number>(key);
+		return cost ?? 0;
+	} catch {
+		// Redis not configured — skip cost tracking
+		return 0;
+	}
 }
 
 export async function trackChatCost(
@@ -48,18 +53,22 @@ export async function trackChatCost(
 	const outputCost = (outputTokens / 1_000_000) * PRICING.output;
 	const totalCost = inputCost + outputCost;
 
-	const key = getTodayKey();
+	try {
+		const key = getTodayKey();
 
-	const redis = getRedis();
+		const redis = getRedis();
 
-	// Atomically increment the cost for today
-	await redis.incrbyfloat(key, totalCost);
+		// Atomically increment the cost for today
+		await redis.incrbyfloat(key, totalCost);
 
-	// Set TTL to 2 days if this is a new key
-	const ttl = await redis.ttl(key);
-	if (ttl === -1) {
-		// -1 means key exists but has no expiration
-		await redis.expire(key, 172800); // 2 days in seconds
+		// Set TTL to 2 days if this is a new key
+		const ttl = await redis.ttl(key);
+		if (ttl === -1) {
+			// -1 means key exists but has no expiration
+			await redis.expire(key, 172800); // 2 days in seconds
+		}
+	} catch {
+		// Redis not configured — skip cost tracking
 	}
 }
 
