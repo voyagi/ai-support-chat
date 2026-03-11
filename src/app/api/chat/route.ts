@@ -269,9 +269,9 @@ export async function POST(req: Request) {
 			tenantId,
 		});
 
-		// pgvector scores exceed 1.0 because embeddings aren't L2-normalized.
-		// Observed: unrelated queries ~1.10, in-KB queries ~1.80+
-		const CONFIDENCE_THRESHOLD = 1.15;
+		// Cosine similarity: 0-1 range. Scores above 0.35 reliably indicate
+		// the query is answered by the knowledge base.
+		const CONFIDENCE_THRESHOLD = 0.35;
 		const bestScore = chunks.length > 0 ? chunks[0].similarity : 0;
 
 		if (bestScore > 0) {
@@ -279,9 +279,9 @@ export async function POST(req: Request) {
 				`[chat] RAG top score: ${bestScore.toFixed(3)} (threshold: ${CONFIDENCE_THRESHOLD})`,
 			);
 		}
-		if (bestScore > CONFIDENCE_THRESHOLD && bestScore <= 1.3) {
+		if (bestScore > CONFIDENCE_THRESHOLD && bestScore <= 0.5) {
 			console.warn(
-				`[chat] Borderline RAG score ${bestScore.toFixed(3)} in zone ${CONFIDENCE_THRESHOLD}-1.30, may need threshold recalibration`,
+				`[chat] Borderline RAG score ${bestScore.toFixed(3)} in zone ${CONFIDENCE_THRESHOLD}-0.50, may need threshold recalibration`,
 			);
 		}
 
