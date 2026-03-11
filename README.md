@@ -6,19 +6,11 @@ An AI-powered customer support chatbot with RAG (Retrieval-Augmented Generation)
 
 ## Screenshots
 
-<!-- TODO: Add screenshots -->
-
-| Chat Interface | Admin Panel | Analytics |
-|---|---|---|
-| ![Chat](docs/screenshots/chat.png) | ![Admin](docs/screenshots/admin.png) | ![Analytics](docs/screenshots/analytics.png) |
-
-| Embeddable Widget | Contact Handoff | Document Upload |
-|---|---|---|
-| ![Widget](docs/screenshots/widget.png) | ![Contact](docs/screenshots/contact.png) | ![Upload](docs/screenshots/upload.png) |
+*Screenshots coming soon.*
 
 ## Features
 
-- **AI Chat with RAG** — answers grounded in your knowledge base, not hallucinated
+- **AI Chat with RAG** — answers grounded in your knowledge base, reducing hallucination risk
 - **Streaming responses** — real-time token-by-token output via Server-Sent Events
 - **Embeddable widget** — drop-in `<script>` tag for any website (Intercom-style floating bubble)
 - **Admin panel** — upload and manage knowledge base documents, view contacts
@@ -86,7 +78,7 @@ See [.env.example](.env.example) for the full list.
 
 ## Architecture
 
-```
+```text
 User sends message
   -> Embed question (text-embedding-3-small)
   -> pgvector similarity search (top 5 chunks)
@@ -96,7 +88,7 @@ User sends message
 
 **Key directories:**
 
-```
+```text
 src/
   app/           — Next.js pages and API routes
   components/    — React components (chat, admin, widget, ui)
