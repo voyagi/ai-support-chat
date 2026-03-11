@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/voyagi/upwork-ai-chatbot/compare/v1.0.0...v1.0.1) (2026-03-11)
+
+
+### Bug Fixes
+
+* **deps:** update minor updates ([#17](https://github.com/voyagi/upwork-ai-chatbot/issues/17)) ([4054b53](https://github.com/voyagi/upwork-ai-chatbot/commit/4054b53b1148c838be8e8085b6bea1753ce65e90))
+
 ## 1.0.0 (2026-03-03)
 
 
