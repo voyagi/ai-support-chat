@@ -6,7 +6,29 @@ An AI-powered customer support chatbot with RAG (Retrieval-Augmented Generation)
 
 ## Screenshots
 
-*Screenshots coming soon.*
+### Chat Interface
+
+AI assistant answering questions from the knowledge base with source citations.
+
+![Chat Interface](screenshots/chat-interface.png)
+
+### Admin Panel
+
+Knowledge base management with 19 uploaded documents, chunk counts, and drag-and-drop upload.
+
+![Admin Panel](screenshots/admin-panel.png)
+
+### Analytics Dashboard
+
+Chat volume trends, response accuracy metrics, and real-time usage statistics.
+
+![Analytics Dashboard](screenshots/analytics-dashboard.png)
+
+### Embeddable Widget
+
+Widget configuration page with live preview showing the chat bubble embedded on any website.
+
+![Embeddable Widget](screenshots/widget-embed.png)
 
 ## Features
 
