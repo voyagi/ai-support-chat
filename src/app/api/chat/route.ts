@@ -42,11 +42,7 @@ interface RequestBody {
 }
 
 /** Build a low-confidence response stream with contact form header. */
-function handleLowConfidence(
-	conversationId: string,
-	userMessage: string,
-	debugInfo?: string,
-) {
+function handleLowConfidence(conversationId: string, userMessage: string) {
 	const noAnswerText =
 		"I don't have information about that in my knowledge base. Let me connect you with our team who can help!";
 
@@ -83,7 +79,6 @@ function handleLowConfidence(
 				conversationId,
 				originalQuestion: userMessage,
 			}),
-			...(debugInfo ? { "X-Debug-Rag": debugInfo } : {}),
 		},
 	});
 }
@@ -268,35 +263,32 @@ export async function POST(req: Request) {
 		}
 
 		// 7. RAG retrieval
-		let chunks: SimilarChunk[];
-		try {
-			chunks = await searchSimilarChunks(userMessage, {
-				threshold: 0.7,
-				count: 5,
-				tenantId,
-			});
-		} catch (ragError) {
-			console.error(
-				"[chat] RAG search threw:",
-				ragError instanceof Error ? ragError.message : ragError,
-			);
-			chunks = [];
-		}
+		const chunks = await searchSimilarChunks(userMessage, {
+			threshold: 0.7,
+			count: 5,
+			tenantId,
+		});
 
 		// Cosine similarity: 0-1 range. Scores above 0.35 reliably indicate
 		// the query is answered by the knowledge base.
 		const CONFIDENCE_THRESHOLD = 0.35;
 		const bestScore = chunks.length > 0 ? chunks[0].similarity : 0;
 
-		console.log(
-			`[chat] RAG result: chunks=${chunks.length}, bestScore=${bestScore.toFixed(3)}, threshold=${CONFIDENCE_THRESHOLD}, query="${userMessage.slice(0, 80)}"`,
-		);
+		if (bestScore > 0) {
+			console.log(
+				`[chat] RAG top score: ${bestScore.toFixed(3)} (threshold: ${CONFIDENCE_THRESHOLD})`,
+			);
+		}
+		if (bestScore > CONFIDENCE_THRESHOLD && bestScore <= 0.5) {
+			console.warn(
+				`[chat] Borderline RAG score ${bestScore.toFixed(3)} in zone ${CONFIDENCE_THRESHOLD}-0.50, may need threshold recalibration`,
+			);
+		}
 
 		const hasConfidentAnswer = bestScore > CONFIDENCE_THRESHOLD;
 
 		if (!hasConfidentAnswer) {
-			const debugInfo = `chunks=${chunks.length},best=${bestScore.toFixed(3)},thr=${CONFIDENCE_THRESHOLD}`;
-			return handleLowConfidence(conversationId, userMessage, debugInfo);
+			return handleLowConfidence(conversationId, userMessage);
 		}
 
 		return handleHighConfidence(
