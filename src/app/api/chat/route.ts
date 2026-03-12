@@ -42,7 +42,11 @@ interface RequestBody {
 }
 
 /** Build a low-confidence response stream with contact form header. */
-function handleLowConfidence(conversationId: string, userMessage: string) {
+function handleLowConfidence(
+	conversationId: string,
+	userMessage: string,
+	debugInfo?: string,
+) {
 	const noAnswerText =
 		"I don't have information about that in my knowledge base. Let me connect you with our team who can help!";
 
@@ -79,6 +83,7 @@ function handleLowConfidence(conversationId: string, userMessage: string) {
 				conversationId,
 				originalQuestion: userMessage,
 			}),
+			...(debugInfo ? { "X-Debug-Rag": debugInfo } : {}),
 		},
 	});
 }
@@ -264,33 +269,31 @@ export async function POST(req: Request) {
 
 		// 7. RAG retrieval
 		let chunks: SimilarChunk[];
+		let ragError: string | undefined;
 		try {
 			chunks = await searchSimilarChunks(userMessage, {
 				threshold: 0.7,
 				count: 5,
 				tenantId,
 			});
-		} catch (ragError) {
-			console.error(
-				"[chat] RAG search error:",
-				ragError instanceof Error ? ragError.message : ragError,
-			);
+		} catch (err) {
+			ragError = err instanceof Error ? err.message : String(err);
+			console.error("[chat] RAG search error:", ragError);
 			chunks = [];
 		}
 
-		// Cosine similarity: 0-1 range. Scores above 0.35 reliably indicate
-		// the query is answered by the knowledge base.
 		const CONFIDENCE_THRESHOLD = 0.35;
 		const bestScore = chunks.length > 0 ? chunks[0].similarity : 0;
+		const debugInfo = `chunks=${chunks.length},best=${bestScore},thr=${CONFIDENCE_THRESHOLD},tenant=${tenantId ?? "null"}${ragError ? ",err=" + ragError.slice(0, 100) : ""}`;
 
 		console.log(
-			`[chat] RAG: chunks=${chunks.length}, bestScore=${bestScore}, threshold=${CONFIDENCE_THRESHOLD}, tenantId=${tenantId ?? "null"}, query="${userMessage.slice(0, 60)}"`,
+			`[chat] RAG: ${debugInfo}, query="${userMessage.slice(0, 60)}"`,
 		);
 
 		const hasConfidentAnswer = bestScore > CONFIDENCE_THRESHOLD;
 
 		if (!hasConfidentAnswer) {
-			return handleLowConfidence(conversationId, userMessage);
+			return handleLowConfidence(conversationId, userMessage, debugInfo);
 		}
 
 		return handleHighConfidence(
