@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.3](https://github.com/voyagi/upwork-ai-chatbot/compare/v1.0.2...v1.0.3) (2026-03-12)
+
+
+### Bug Fixes
+
+* lower SQL similarity threshold from 0.7 to 0.3 ([458226d](https://github.com/voyagi/upwork-ai-chatbot/commit/458226d8d0c16139ce41eb38cbb9968fd85a0cc2))
+
 ## [1.0.2](https://github.com/voyagi/upwork-ai-chatbot/compare/v1.0.1...v1.0.2) (2026-03-12)
 
 
