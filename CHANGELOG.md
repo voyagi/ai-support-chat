@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.2](https://github.com/voyagi/upwork-ai-chatbot/compare/v1.0.1...v1.0.2) (2026-03-12)
+
+
+### Bug Fixes
+
+* pin Node.js engine to &lt;25, set Vercel to 22.x ([6149eae](https://github.com/voyagi/upwork-ai-chatbot/commit/6149eae0b75c09b013c7a9df7fe3bba8fce09d4e))
+* pin Node.js to 22 via .nvmrc for Vercel compatibility ([60550d0](https://github.com/voyagi/upwork-ai-chatbot/commit/60550d06efd91e31cf98f4f7868d94fd01ef2777))
+
 ## [1.0.1](https://github.com/voyagi/upwork-ai-chatbot/compare/v1.0.0...v1.0.1) (2026-03-11)
 
 
