@@ -272,7 +272,7 @@ export async function POST(req: Request) {
 		let ragError: string | undefined;
 		try {
 			chunks = await searchSimilarChunks(userMessage, {
-				threshold: 0.7,
+				threshold: 0.3,
 				count: 5,
 				tenantId,
 			});

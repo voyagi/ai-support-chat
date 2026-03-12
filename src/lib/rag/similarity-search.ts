@@ -29,7 +29,7 @@ export async function searchSimilarChunks(
 	query: string,
 	options?: SearchOptions,
 ): Promise<SimilarChunk[]> {
-	const threshold = options?.threshold ?? 0.7;
+	const threshold = options?.threshold ?? 0.3;
 	const count = options?.count ?? 5;
 
 	let queryEmbedding: number[];
