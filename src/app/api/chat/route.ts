@@ -288,6 +288,9 @@ export async function POST(req: Request) {
 		const hasConfidentAnswer = bestScore > CONFIDENCE_THRESHOLD;
 
 		if (!hasConfidentAnswer) {
+			console.error(
+				`[chat] RAG MISS: chunks=${chunks.length}, bestScore=${bestScore}, threshold=${CONFIDENCE_THRESHOLD}, query="${userMessage.slice(0, 80)}"`,
+			);
 			return handleLowConfidence(conversationId, userMessage);
 		}
 
