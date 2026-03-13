@@ -2,11 +2,8 @@
 
 ## Purpose
 
-Portfolio demo for an Upwork freelancing profile. Must be a **live,
-deployed chatbot** that prospects can interact with. This is project #1
-of 4 portfolio pieces — it demonstrates AI chatbot + RAG skills.
-
-Full Upwork strategy: `C:\Users\Eagi\Making money\side-projects\upwork-strategy.md`
+Portfolio demo showcasing AI chatbot + RAG skills. A **live, deployed
+chatbot** that visitors can interact with.
 
 ## What to Build
 
@@ -113,13 +110,7 @@ the demo feel realistic without needing a real client.
 
 ## Deployment
 
-Deploy to Vercel. The live URL will be linked from the Upwork profile.
-Widget embed should work on any external site via iframe.
-
-
-## Test Credentials
-
-<!-- Auto-maintained by GSD — updated when auth tasks execute -->
+Deploy to Vercel. Widget embed should work on any external site via iframe.
 
 ## Commands
 
