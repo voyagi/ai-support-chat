@@ -6,6 +6,33 @@ on:
 
 jobs:
   mirror:
-    uses: voyagi/.github-workflows/.github/workflows/mirror-codeberg.yml@main
-    secrets:
-      CODEBERG_TOKEN: ${{ secrets.CODEBERG_TOKEN }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create Codeberg repo if missing
+        env:
+          CODEBERG_TOKEN: ${{ secrets.CODEBERG_TOKEN }}
+          REPO_NAME: ${{ github.event.repository.name }}
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: token ${CODEBERG_TOKEN}" \
+            "https://codeberg.org/api/v1/repos/voyagi/${REPO_NAME}")
+          if [ "$STATUS" != "200" ]; then
+            curl -s -X POST \
+              -H "Authorization: token ${CODEBERG_TOKEN}" \
+              -H "Content-Type: application/json" \
+              -d "{\"name\":\"${REPO_NAME}\",\"description\":\"$(echo '${{ github.event.repository.description }}' | head -c 255)\"}" \
+              "https://codeberg.org/api/v1/user/repos"
+          fi
+
+      - name: Push to Codeberg
+        env:
+          CODEBERG_TOKEN: ${{ secrets.CODEBERG_TOKEN }}
+          REPO_NAME: ${{ github.event.repository.name }}
+        run: |
+          git remote add codeberg "https://voyagi:${CODEBERG_TOKEN}@codeberg.org/voyagi/${REPO_NAME}.git"
+          git push codeberg --all --force
+          git push codeberg --tags --force
