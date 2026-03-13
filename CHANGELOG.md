@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.4](https://github.com/voyagi/ai-support-chat/compare/v1.0.3...v1.0.4) (2026-03-13)
+
+
+### Bug Fixes
+
+* **ci:** inline mirror workflow and create Codeberg repo if missing ([#24](https://github.com/voyagi/ai-support-chat/issues/24)) ([4d97a0e](https://github.com/voyagi/ai-support-chat/commit/4d97a0e9ae198f2cba6f744d5759dad456a06a45))
+
 ## [1.0.3](https://github.com/voyagi/upwork-ai-chatbot/compare/v1.0.2...v1.0.3) (2026-03-12)
 
 
