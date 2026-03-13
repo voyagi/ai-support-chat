@@ -48,8 +48,8 @@ next-env.d.ts
 backup-supabase.mjs
 
 # local artifacts
-.claude/reviews/
-.claude/skills/
+.planning/
+.claude/
 HANDOFF-*.md
 
 # Nested node_modules (skills, tools)
