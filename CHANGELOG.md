@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.5](https://github.com/voyagi/ai-support-chat/compare/v1.0.4...v1.0.5) (2026-03-15)
+
+
+### Bug Fixes
+
+* inline renovate config from private preset repo ([#27](https://github.com/voyagi/ai-support-chat/issues/27)) ([ebf41ff](https://github.com/voyagi/ai-support-chat/commit/ebf41ff9fd46b05bb8e5e88adeeaebcdf716f214)), closes [#26](https://github.com/voyagi/ai-support-chat/issues/26)
+
 ## [1.0.4](https://github.com/voyagi/ai-support-chat/compare/v1.0.3...v1.0.4) (2026-03-13)
 
 
