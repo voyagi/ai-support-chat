@@ -58,3 +58,5 @@ HANDOFF-*.md
 **/bun.lock
 
 .vercel
+
+.mcp.json
