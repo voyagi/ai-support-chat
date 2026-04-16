@@ -3,7 +3,7 @@
 	"version": "1.0.4",
 	"private": true,
 	"engines": {
-		"node": ">=20.0.0 <23",
+		"node": ">=20.0.0 <25",
 		"npm": ">=10.0.0 <11"
 	},
 	"scripts": {
@@ -50,7 +50,7 @@
 		"@rollup/plugin-terser": "^1.0.0",
 		"@rollup/plugin-typescript": "^12.3.0",
 		"@tailwindcss/postcss": "^4.1.4",
-		"@types/node": "^22.15.0",
+		"@types/node": "^24.0.0",
 		"@types/react": "^19.2.14",
 		"@types/react-dom": "^19.1.2",
 		"rollup": "^4.59.0",
