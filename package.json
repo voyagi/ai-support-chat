@@ -1,6 +1,6 @@
 {
 	"name": "upwork-ai-chatbot",
-	"version": "1.0.4",
+	"version": "1.0.5",
 	"private": true,
 	"engines": {
 		"node": ">=20.0.0 <23",
