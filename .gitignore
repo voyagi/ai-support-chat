@@ -44,8 +44,15 @@ next-env.d.ts
 .vscode/
 
 # backup/migration
+# One-off migration scripts stay OUT of the repo: they hardcode connection
+# strings for a single run, and /backup/ holds real customer PII.
 /backup/
 backup-supabase.mjs
+import-to-neon.mjs
+backup-schema.sql
+
+# supabase local temp state
+supabase/.temp/
 
 # local artifacts
 .planning/
